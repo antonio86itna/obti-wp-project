@@ -20,6 +20,7 @@ class Booking extends Widget_Base {
     }
 
     protected function render(){
+        wp_enqueue_style('flatpickr');
         wp_enqueue_script('obti-booking-widget');
         $ajax = esc_url( rest_url('obti/v1') );
         ?>
@@ -35,7 +36,7 @@ class Booking extends Widget_Base {
                   <div class="space-y-6">
                     <div>
                       <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Date','obti'); ?></label>
-                      <input type="date" name="date" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
+                      <input id="date-picker" name="date" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Tour Time','obti'); ?></label>
@@ -71,7 +72,8 @@ class Booking extends Widget_Base {
                   <hr class="border-green-400 my-4">
                   <div class="flex justify-between text-2xl font-bold"><span><?php esc_html_e('Total:','obti'); ?></span><span id="obti-sum-total">€<?php echo esc_html( number_format( (float)\OBTI_Settings::get('price',20), 2 ) ); ?></span></div>
                 </div>
-                <button id="obti-pay-btn" form="obti-booking-form" class="mt-8 w-full bg-white text-theme-primary font-bold py-3 px-6 rounded-full text-lg hover:bg-gray-100 transition-all duration-300 flex items-center justify-center space-x-2">
+                <button type="submit" id="obti-pay-btn" form="obti-booking-form" class="mt-8 w-full bg-yellow-400 text-gray-900 font-bold py-3 px-6 rounded-full text-lg hover:bg-yellow-500 transition-all duration-300 flex items-center justify-center space-x-2">
+                  <i data-lucide="credit-card"></i>
                   <span><?php esc_html_e('Pay with Stripe','obti'); ?></span>
                 </button>
                 <p class="text-xs text-center mt-4 text-green-200"><?php esc_html_e('Secure payment guaranteed','obti'); ?></p>
