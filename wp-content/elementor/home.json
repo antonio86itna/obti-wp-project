@@ -114,7 +114,9 @@
       ]
     }
   ],
-  "page_settings": {},
+  "page_settings": {
+    "container_width": 1280
+  },
   "metadata": {},
   "category": "",
   "tags": []
