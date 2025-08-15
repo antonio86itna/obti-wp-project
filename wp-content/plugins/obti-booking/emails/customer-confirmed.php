@@ -30,9 +30,9 @@ $link = $account_page_id ? add_query_arg(['token'=>$token,'email'=>$email], get_
         <p style="margin-top:12px;color:#111827">Manage or cancel (up to 72h before): <a href="<?php echo esc_url($link); ?>" style="color:#16a34a">My Bookings</a></p>
         <p style="margin-top:12px;color:#374151;font-size:14px">In case of bad weather or cancellation we offer a full refund or the possibility to reschedule.</p>
       </div>
-      <div style="background:#f3f4f6;color:#6b7280;padding:16px 24px;text-align:center;font-size:12px">
-        Powered by <a href="https://www.totaliweb.com" style="color:#16a34a;text-decoration:none">Totaliweb</a>
-      </div>
+      <p style="font-size:12px;color:#aaa;text-align:center;margin-top:20px">
+        Powered by <a href="https://www.totaliweb.com" style="color:#16a34a">Totaliweb</a>
+      </p>
     </div>
   </body>
 </html>
