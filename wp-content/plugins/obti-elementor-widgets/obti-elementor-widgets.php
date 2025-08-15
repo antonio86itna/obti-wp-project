@@ -52,4 +52,6 @@ add_action('elementor/elements/categories_registered', function($elements_manage
 // Assets for booking widget
 add_action('wp_enqueue_scripts', function(){
     wp_register_script('obti-booking-widget', OBTI_EW_URL.'assets/js/booking-widget.js', [], '1.0.0', true);
+    wp_enqueue_script('mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', [], '2.15.0', true);
+    wp_enqueue_script('turf', 'https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js', [], '6.5.0', true);
 });
