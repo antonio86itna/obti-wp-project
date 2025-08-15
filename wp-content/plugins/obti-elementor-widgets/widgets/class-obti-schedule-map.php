@@ -45,21 +45,71 @@ class Schedule_Map extends Widget_Base {
                 <p class="text-gray-600"><?php echo esc_html($s['afternoon_desc']); ?></p>
               </div>
               <div class="md:col-span-2 lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center">
-                <div class="map-container-3d w-full max-w-[280px] mx-auto"<?php if ($token) echo ' data-mapbox-token="' . esc_attr($token) . '"'; ?>>
-                  <svg id="ischia-map" viewBox="0 0 250 220" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M191.1,52.3C171.3,21.1,133,12.3,96.3,27.5C59.5,42.7,37,80.1,42.5,119.5c5.5,39.4,36.4,71.2,75.8,76.5c39.4,5.3,77.5-16.1,92.5-52.9c15-36.8,4.3-79.3-25.7-99.3" fill="none" stroke="white" stroke-width="3" stroke-dasharray="8 5" opacity="0.7"/>
-                    <path id="ischia-island-shape" d="M200.3,72.4c-13.3-21.2-35.9-34.9-61.1-37.3c-25.2-2.4-50.5,6.5-68.9,24.1c-18.4,17.6-28.4,42.6-27.4,68.6c1,26,13.1,50.1,33.1,65.8c20,15.7,46.5,21.4,72.2,15.2c25.7-6.2,47.4-23.4,60.3-46.2c12.9-22.8,16.1-50-0.6-72.2C205.8,87.1,203.4,79.2,200.3,72.4z" fill="#16a34a" stroke="#15803d" stroke-width="1.5"/>
-                    <g id="bus-icon" style="offset-path:path('M191.1,52.3C171.3,21.1,133,12.3,96.3,27.5C59.5,42.7,37,80.1,42.5,119.5c5.5,39.4,36.4,71.2,75.8,76.5c39.4,5.3,77.5-16.1,92.5-52.9c15-36.8,4.3-79.3-25.7-99.3'); animation: moveBus 18s linear infinite; width:24px; height:24px;">
-                      <path d="M19 8H5c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zM5 16c-1.1 0-2-.9-2-2v-1h18v1c0 1.1-.9 2-2 2zM6 11.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="#facc15"/>
-                    </g>
-                    <style>@keyframes moveBus{0%{offset-distance:0%}100%{offset-distance:100%}}</style>
-                  </svg>
-                </div>
+                <div id="mapbox-map" class="w-full max-w-[280px] h-[280px] mx-auto rounded-lg"></div>
                 <p class="text-center mt-4 font-medium"><?php esc_html_e('A preview of our island tour route.','obti'); ?></p>
               </div>
             </div>
           </div>
         </section>
+        <script>
+          window.addEventListener('load', function(){
+            mapboxgl.accessToken = '<?php echo esc_js($token); ?>';
+            const routeCoordinates = [
+              [13.860, 40.739],
+              [13.883, 40.750],
+              [13.908, 40.750],
+              [13.943, 40.744],
+              [13.940, 40.715],
+              [13.883, 40.706],
+              [13.860, 40.739]
+            ];
+
+            const map = new mapboxgl.Map({
+              container: 'mapbox-map',
+              style: 'mapbox://styles/mapbox/streets-v12',
+              center: routeCoordinates[0],
+              zoom: 11
+            });
+
+            map.on('load', function(){
+              map.addSource('route', {
+                type: 'geojson',
+                data: {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: {
+                    type: 'LineString',
+                    coordinates: routeCoordinates
+                  }
+                }
+              });
+
+              map.addLayer({
+                id: 'route',
+                type: 'line',
+                source: 'route',
+                layout: { 'line-cap': 'round', 'line-join': 'round' },
+                paint: { 'line-color': '#16a34a', 'line-width': 4 }
+              });
+
+              const marker = new mapboxgl.Marker({color:'#facc15'})
+                .setLngLat(routeCoordinates[0])
+                .addTo(map);
+
+              const line = turf.lineString(routeCoordinates);
+              const length = turf.length(line);
+              let progress = 0;
+              function animate(){
+                const point = turf.along(line, progress, {units:'kilometers'}).geometry.coordinates;
+                marker.setLngLat(point);
+                progress += 0.05;
+                if(progress > length){ progress = 0; }
+                requestAnimationFrame(animate);
+              }
+              animate();
+            });
+          });
+        </script>
         <?php
     }
 }
