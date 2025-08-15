@@ -10,10 +10,25 @@ add_action('after_setup_theme', function(){
 
 // Enqueue assets (compiled CSS and Lucide icons)
 add_action('wp_enqueue_scripts', function(){
-    // Lucide icons
-    wp_enqueue_script('obti-lucide', 'https://unpkg.com/lucide@latest', [], null, true);
     // Compiled Tailwind CSS
     wp_enqueue_style('obti-css', get_template_directory_uri() . '/assets/css/obti.css', [], '1.0.0');
+
+    // Lucide icons
+    wp_enqueue_script('obti-lucide', 'https://unpkg.com/lucide@latest', [], null, true);
+
+    // Third-party libraries
+    wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], null, true);
+    wp_enqueue_script('mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', [], null, true);
+    wp_enqueue_script('turf', 'https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js', [], null, true);
+
+    // Chatbot widget
+    wp_enqueue_script('obti-chatbot', get_template_directory_uri() . '/assets/js/chatbot.js', [], '1.0.0', true);
+
+    // Localize tokens
+    wp_localize_script('obti-chatbot', 'obtiConfig', [
+        'mapbox_token'    => get_theme_mod('mapbox_token'),
+        'chatbot_api_key' => get_theme_mod('chatbot_api_key'),
+    ]);
 });
 
 // Add a small script to init lucide icons after DOM ready
