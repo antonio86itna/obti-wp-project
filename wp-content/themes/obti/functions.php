@@ -29,3 +29,38 @@ add_action('wp_footer', function(){
 add_action('after_setup_theme', function(){
     register_nav_menus([ 'primary' => __('Primary Menu','obti') ]);
 });
+
+// Theme settings for contact info and socials
+add_action('customize_register', function($wp_customize){
+    $wp_customize->add_section('obti_theme_settings', [
+        'title'    => __('Theme Settings', 'obti'),
+        'priority' => 30,
+    ]);
+
+    // Email address
+    $wp_customize->add_setting('obti_email', [
+        'sanitize_callback' => 'sanitize_email',
+    ]);
+    $wp_customize->add_control('obti_email', [
+        'label'   => __('Contact Email', 'obti'),
+        'section' => 'obti_theme_settings',
+        'type'    => 'email',
+    ]);
+
+    $socials = [
+        'facebook'  => __('Facebook URL', 'obti'),
+        'instagram' => __('Instagram URL', 'obti'),
+        'tiktok'    => __('TikTok URL', 'obti'),
+    ];
+
+    foreach ($socials as $id => $label) {
+        $wp_customize->add_setting("obti_{$id}_url", [
+            'sanitize_callback' => 'esc_url_raw',
+        ]);
+        $wp_customize->add_control("obti_{$id}_url", [
+            'label'   => $label,
+            'section' => 'obti_theme_settings',
+            'type'    => 'url',
+        ]);
+    }
+});

@@ -7,7 +7,7 @@
 <?php wp_head(); ?>
 </head>
 <body <?php body_class('bg-gray-50 text-gray-800'); ?>>
-<header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+<header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white">
   <div class="container mx-auto px-6 py-4 flex justify-between items-center">
     <a class="text-2xl font-bold text-gray-800" href="<?php echo esc_url(home_url('/')); ?>">
       OpenBusTour<span class="theme-primary">Ischia</span>.com
@@ -16,21 +16,37 @@
       <?php
         wp_nav_menu([
           'theme_location' => 'primary',
-          'container' => false,
-          'items_wrap' => '%3$s',
-          'fallback_cb' => false
+          'container'    => false,
+          'items_wrap'   => '%3$s',
+          'fallback_cb'  => false
         ]);
       ?>
     </nav>
+    <div class="hidden md:flex items-center space-x-6">
+      <div class="flex items-center space-x-1 text-sm font-semibold">
+        <a href="#" class="hover:text-theme-primary">EN</a>
+        <span>|</span>
+        <a href="#" class="hover:text-theme-primary">IT</a>
+      </div>
+      <a href="#" class="bg-theme-primary text-white px-4 py-2 rounded">Book Now</a>
+    </div>
     <button id="mobile-menu-button" class="md:hidden"><i data-lucide="menu"></i></button>
   </div>
   <div id="mobile-menu" class="hidden md:hidden bg-white px-6 pb-4">
+    <div class="py-4 flex items-center justify-between border-b">
+      <div class="flex items-center space-x-1 text-sm font-semibold">
+        <a href="#" class="hover:text-theme-primary">EN</a>
+        <span>|</span>
+        <a href="#" class="hover:text-theme-primary">IT</a>
+      </div>
+      <a href="#" class="bg-theme-primary text-white px-4 py-2 rounded">Book Now</a>
+    </div>
     <?php
       wp_nav_menu([
         'theme_location' => 'primary',
-        'container' => false,
-        'items_wrap' => '<ul class="space-y-2">%3$s</ul>',
-        'fallback_cb' => false
+        'container'      => false,
+        'items_wrap'     => '<ul class="space-y-2 py-4">%3$s</ul>',
+        'fallback_cb'    => false
       ]);
     ?>
   </div>
