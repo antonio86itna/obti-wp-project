@@ -1,14 +1,13 @@
 <?php
-namespace {
-    if (!defined('ABSPATH')) { exit; }
-}
 namespace OBTI_EW;
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 
 class OBTI_EW_Schedule_Map extends Widget_Base {
-    public function get_name(){ return 'obti-schedule-map'; }
+    public function get_name(){ return __('obti-schedule-map','obti'); }
     public function get_title(){ return __('OBTI Schedule & Map','obti'); }
     public function get_icon(){ return 'eicon-time-line'; }
     public function get_categories(){ return ['obti']; }

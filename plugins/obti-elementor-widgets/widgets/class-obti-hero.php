@@ -1,14 +1,13 @@
 <?php
-namespace {
-    if (!defined('ABSPATH')) { exit; }
-}
 namespace OBTI_EW;
+
+if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 
 class OBTI_EW_Hero extends Widget_Base {
-    public function get_name(){ return 'obti-hero'; }
+    public function get_name(){ return __('obti-hero','obti'); }
     public function get_title(){ return __('OBTI Hero','obti'); }
     public function get_icon(){ return 'eicon-slider-full-screen'; }
     public function get_categories(){ return ['obti']; }
