@@ -11,7 +11,22 @@ if (!defined('ABSPATH')) { exit; }
 define('OBTI_EW_DIR', plugin_dir_path(__FILE__));
 define('OBTI_EW_URL', plugin_dir_url(__FILE__));
 
+// Activation check for Elementor
+register_activation_hook(__FILE__, function(){
+    if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
+        set_transient('obti_ew_missing_elementor', true);
+    }
+});
+
+add_action('admin_notices', function(){
+    if ( get_transient('obti_ew_missing_elementor') ) {
+        delete_transient('obti_ew_missing_elementor');
+        echo '<div class="notice notice-error"><p>' . esc_html__('Elementor plugin is required for OBTI Elementor Widgets.', 'obti') . '</p></div>';
+    }
+});
+
 add_action('elementor/widgets/register', function($widgets_manager){
+    if ( ! did_action( 'elementor/loaded' ) ) { return; }
     require_once OBTI_EW_DIR.'widgets/class-obti-hero.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-highlights.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-schedule-map.php';
