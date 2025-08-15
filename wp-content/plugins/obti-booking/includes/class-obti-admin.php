@@ -19,6 +19,7 @@ class OBTI_Admin {
             'service_fee' => get_post_meta($post->ID,'_obti_service_fee', true),
             'agency_fee' => get_post_meta($post->ID,'_obti_agency_fee', true),
             'total'=> get_post_meta($post->ID,'_obti_total', true),
+            'fee_transferred' => get_post_meta($post->ID,'_obti_fee_transferred', true),
             'email'=> get_post_meta($post->ID,'_obti_email', true),
             'name' => get_post_meta($post->ID,'_obti_name', true),
             'session' => get_post_meta($post->ID,'_obti_stripe_session_id', true),

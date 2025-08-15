@@ -20,6 +20,7 @@ require_once OBTI_PLUGIN_DIR . 'includes/class-obti-checkout.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-webhooks.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-cron.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-admin.php';
+require_once OBTI_PLUGIN_DIR . 'includes/class-obti-transfers.php';
 
 function obti_get_page_id( $title ) {
     $q = new WP_Query([
