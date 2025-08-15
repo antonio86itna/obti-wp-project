@@ -14,6 +14,7 @@ class OBTI_Settings {
             'service_fee_percent' => 0, // % passed to customer as "service fee"
             'agency_fee_percent' => 2.5, // Totaliweb percent
             'address_label' => 'Via Filippo di Lustro 19, 80075 Forio (NA)',
+            'api_key' => '',
             'stripe_mode' => 'test',
             'stripe_secret_key' => '',
             'stripe_publishable_key' => '',
@@ -85,6 +86,8 @@ class OBTI_Admin_Settings_Page {
                 <td><input type="number" step="0.01" name="obti_settings[agency_fee_percent]" value="<?php echo esc_attr($o['agency_fee_percent']); ?>"></td></tr>
               <tr><th><?php esc_html_e('Start/Return point label','obti'); ?></th>
                 <td><input type="text" size="60" name="obti_settings[address_label]" value="<?php echo esc_attr($o['address_label']); ?>"></td></tr>
+              <tr><th><?php esc_html_e('API Key for REST','obti'); ?></th>
+                <td><input type="text" size="60" name="obti_settings[api_key]" value="<?php echo esc_attr($o['api_key']); ?>"></td></tr>
               <tr><th><?php esc_html_e('Stripe mode','obti'); ?></th>
                 <td>
                   <select name="obti_settings[stripe_mode]">
