@@ -8,15 +8,11 @@ add_action('after_setup_theme', function(){
     add_theme_support('post-thumbnails');
 });
 
-// Enqueue assets (Tailwind CDN, Inter, Lucide, custom CSS)
+// Enqueue assets (compiled CSS and Lucide icons)
 add_action('wp_enqueue_scripts', function(){
-    // Tailwind CDN (prototype)
-    wp_enqueue_script('obti-tailwind', 'https://cdn.tailwindcss.com', [], null, false);
-    // Inter font
-    wp_enqueue_style('obti-inter', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap', [], null);
     // Lucide icons
     wp_enqueue_script('obti-lucide', 'https://unpkg.com/lucide@latest', [], null, true);
-    // Custom CSS (theme utility classes)
+    // Compiled Tailwind CSS
     wp_enqueue_style('obti-css', get_template_directory_uri() . '/assets/css/obti.css', [], '1.0.0');
 });
 
