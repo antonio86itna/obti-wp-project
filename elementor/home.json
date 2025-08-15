@@ -1,0 +1,121 @@
+{
+  "version": "0.4",
+  "title": "Home",
+  "type": "page",
+  "content": [
+    {
+      "id": "section-hero",
+      "elType": "section",
+      "settings": [],
+      "elements": [
+        {
+          "id": "column-hero",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "widget-hero",
+              "elType": "widget",
+              "widgetType": "obti-hero",
+              "settings": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-highlights",
+      "elType": "section",
+      "settings": [],
+      "elements": [
+        {
+          "id": "column-highlights",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "widget-highlights",
+              "elType": "widget",
+              "widgetType": "obti-highlights",
+              "settings": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-schedule-map",
+      "elType": "section",
+      "settings": [],
+      "elements": [
+        {
+          "id": "column-schedule-map",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "widget-schedule-map",
+              "elType": "widget",
+              "widgetType": "obti-schedule-map",
+              "settings": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-faq",
+      "elType": "section",
+      "settings": [],
+      "elements": [
+        {
+          "id": "column-faq",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "widget-faq",
+              "elType": "widget",
+              "widgetType": "obti-faq",
+              "settings": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-booking",
+      "elType": "section",
+      "settings": [],
+      "elements": [
+        {
+          "id": "column-booking",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "widget-booking",
+              "elType": "widget",
+              "widgetType": "obti-booking",
+              "settings": {}
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "page_settings": {},
+  "metadata": {},
+  "category": "",
+  "tags": []
+}
