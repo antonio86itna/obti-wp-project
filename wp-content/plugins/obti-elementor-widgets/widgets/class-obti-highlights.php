@@ -7,7 +7,7 @@ use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 use Elementor\Repeater;
 
-class OBTI_EW_Highlights extends Widget_Base {
+class Highlights extends Widget_Base {
     public function get_name(){ return __('obti-highlights','obti'); }
     public function get_title(){ return __('OBTI Tour Highlights','obti'); }
     public function get_icon(){ return 'eicon-bullet-list'; }

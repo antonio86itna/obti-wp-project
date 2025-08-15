@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 
-class OBTI_EW_Booking extends Widget_Base {
+class Booking extends Widget_Base {
     public function get_name(){ return __('obti-booking','obti'); }
     public function get_title(){ return __('OBTI Booking','obti'); }
     public function get_icon(){ return 'eicon-cart'; }
