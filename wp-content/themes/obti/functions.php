@@ -29,6 +29,15 @@ add_action('wp_enqueue_scripts', function(){
         'mapbox_token'    => get_theme_mod('mapbox_token'),
         'chatbot_api_key' => get_theme_mod('chatbot_api_key'),
     ]);
+
+    // Localize translations
+    wp_localize_script('obti-chatbot', 'obti_translations', [
+        'title'         => __('Chatbot', 'obti'),
+        'placeholder'   => __('Ask...', 'obti'),
+        'send'          => __('Send', 'obti'),
+        'no_answer'     => __('No response', 'obti'),
+        'network_error' => __('Network error', 'obti'),
+    ]);
 });
 
 // Add a small script to init lucide icons after DOM ready
