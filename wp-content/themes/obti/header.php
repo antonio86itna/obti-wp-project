@@ -23,6 +23,23 @@
       ?>
     </nav>
     <div class="hidden md:flex items-center space-x-6">
+      <?php
+        $socials = [
+          'facebook'  => get_theme_mod('social_facebook'),
+          'instagram' => get_theme_mod('social_instagram'),
+          'twitter'   => get_theme_mod('social_twitter'),
+        ];
+        $socials = array_filter($socials);
+        if ($socials) :
+      ?>
+      <div class="flex items-center space-x-4">
+        <?php foreach ($socials as $icon => $url) : ?>
+          <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" class="hover:text-theme-primary">
+            <i data-lucide="<?php echo esc_attr($icon); ?>"></i>
+          </a>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
       <div class="flex items-center space-x-1 text-sm font-semibold">
         <a href="#" class="hover:text-theme-primary">EN</a>
         <span>|</span>
@@ -41,6 +58,22 @@
       </div>
       <a href="#" class="bg-theme-primary text-white px-4 py-2 rounded">Book Now</a>
     </div>
+    <?php
+      $mobile_socials = [
+        'facebook'  => get_theme_mod('social_facebook'),
+        'instagram' => get_theme_mod('social_instagram'),
+        'twitter'   => get_theme_mod('social_twitter'),
+      ];
+      $mobile_socials = array_filter($mobile_socials);
+      if ($mobile_socials) : ?>
+      <div class="flex justify-center space-x-6 py-4 border-b">
+        <?php foreach ($mobile_socials as $icon => $url) : ?>
+          <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" class="hover:text-theme-primary">
+            <i data-lucide="<?php echo esc_attr($icon); ?>"></i>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
     <?php
       wp_nav_menu([
         'theme_location' => 'primary',

@@ -21,6 +21,16 @@ npm install
 npm run build:css
 ```
 
+## Theme Customizer Settings
+
+The theme adds a **Theme Settings** section under *Appearance → Customize* with the following options:
+
+- **Facebook URL** (`social_facebook`)
+- **Instagram URL** (`social_instagram`)
+- **Twitter URL** (`social_twitter`)
+- **Mapbox Token** (`mapbox_token`) – used by the Schedule & Map widget
+- **Chatbot API Key** (`chatbot_api_key`) – used by the Chatbot widget
+
 ## Elementor Home Template
 
 A prebuilt Home page layout using custom widgets is stored in [`wp-content/elementor/home.json`](wp-content/elementor/home.json).

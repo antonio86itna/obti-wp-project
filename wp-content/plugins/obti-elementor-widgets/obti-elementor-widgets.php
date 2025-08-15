@@ -32,11 +32,13 @@ add_action('elementor/widgets/register', function($widgets_manager){
     require_once OBTI_EW_DIR.'widgets/class-obti-schedule-map.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-faq.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-booking.php';
+    require_once OBTI_EW_DIR.'widgets/class-obti-chatbot.php';
     $widgets_manager->register( new \OBTI_EW\Hero() );
     $widgets_manager->register( new \OBTI_EW\Highlights() );
     $widgets_manager->register( new \OBTI_EW\Schedule_Map() );
     $widgets_manager->register( new \OBTI_EW\FAQ() );
     $widgets_manager->register( new \OBTI_EW\Booking() );
+    $widgets_manager->register( new \OBTI_EW\Chatbot() );
 });
 
 // Category

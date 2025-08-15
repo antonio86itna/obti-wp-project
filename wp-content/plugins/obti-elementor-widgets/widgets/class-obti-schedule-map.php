@@ -25,6 +25,7 @@ class Schedule_Map extends Widget_Base {
 
     protected function render(){
         $s = $this->get_settings_for_display();
+        $token = get_theme_mod('mapbox_token');
         ?>
         <section class="py-20">
           <div class="container mx-auto px-6">
@@ -44,7 +45,7 @@ class Schedule_Map extends Widget_Base {
                 <p class="text-gray-600"><?php echo esc_html($s['afternoon_desc']); ?></p>
               </div>
               <div class="md:col-span-2 lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center">
-                <div class="map-container-3d w-full max-w-[280px] mx-auto">
+                <div class="map-container-3d w-full max-w-[280px] mx-auto"<?php if ($token) echo ' data-mapbox-token="' . esc_attr($token) . '"'; ?>>
                   <svg id="ischia-map" viewBox="0 0 250 220" xmlns="http://www.w3.org/2000/svg">
                     <path d="M191.1,52.3C171.3,21.1,133,12.3,96.3,27.5C59.5,42.7,37,80.1,42.5,119.5c5.5,39.4,36.4,71.2,75.8,76.5c39.4,5.3,77.5-16.1,92.5-52.9c15-36.8,4.3-79.3-25.7-99.3" fill="none" stroke="white" stroke-width="3" stroke-dasharray="8 5" opacity="0.7"/>
                     <path id="ischia-island-shape" d="M200.3,72.4c-13.3-21.2-35.9-34.9-61.1-37.3c-25.2-2.4-50.5,6.5-68.9,24.1c-18.4,17.6-28.4,42.6-27.4,68.6c1,26,13.1,50.1,33.1,65.8c20,15.7,46.5,21.4,72.2,15.2c25.7-6.2,47.4-23.4,60.3-46.2c12.9-22.8,16.1-50-0.6-72.2C205.8,87.1,203.4,79.2,200.3,72.4z" fill="#16a34a" stroke="#15803d" stroke-width="1.5"/>

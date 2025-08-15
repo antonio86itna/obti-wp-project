@@ -48,19 +48,37 @@ add_action('customize_register', function($wp_customize){
     ]);
 
     $socials = [
-        'facebook'  => __('Facebook URL', 'obti'),
-        'instagram' => __('Instagram URL', 'obti'),
-        'tiktok'    => __('TikTok URL', 'obti'),
+        'social_facebook'  => __('Facebook URL', 'obti'),
+        'social_instagram' => __('Instagram URL', 'obti'),
+        'social_twitter'   => __('Twitter URL', 'obti'),
     ];
 
     foreach ($socials as $id => $label) {
-        $wp_customize->add_setting("obti_{$id}_url", [
+        $wp_customize->add_setting($id, [
             'sanitize_callback' => 'esc_url_raw',
         ]);
-        $wp_customize->add_control("obti_{$id}_url", [
+        $wp_customize->add_control($id, [
             'label'   => $label,
             'section' => 'obti_theme_settings',
             'type'    => 'url',
         ]);
     }
+
+    $wp_customize->add_setting('mapbox_token', [
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('mapbox_token', [
+        'label'   => __('Mapbox Token', 'obti'),
+        'section' => 'obti_theme_settings',
+        'type'    => 'text',
+    ]);
+
+    $wp_customize->add_setting('chatbot_api_key', [
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('chatbot_api_key', [
+        'label'   => __('Chatbot API Key', 'obti'),
+        'section' => 'obti_theme_settings',
+        'type'    => 'text',
+    ]);
 });

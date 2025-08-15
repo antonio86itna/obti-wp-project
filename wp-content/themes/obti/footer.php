@@ -10,9 +10,9 @@
     <?php endif; ?>
     <?php
       $socials = [
-        'facebook'  => get_theme_mod('obti_facebook_url'),
-        'instagram' => get_theme_mod('obti_instagram_url'),
-        'tiktok'    => get_theme_mod('obti_tiktok_url'),
+        'facebook'  => get_theme_mod('social_facebook'),
+        'instagram' => get_theme_mod('social_instagram'),
+        'twitter'   => get_theme_mod('social_twitter'),
       ];
       $socials = array_filter($socials);
       if ($socials) : ?>
