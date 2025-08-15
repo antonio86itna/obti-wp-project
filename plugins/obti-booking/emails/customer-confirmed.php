@@ -8,8 +8,8 @@ $qty   = (int) get_post_meta($booking_id,'_obti_qty', true);
 $total = get_post_meta($booking_id,'_obti_total', true);
 $token = get_post_meta($booking_id,'_obti_manage_token', true);
 $address = OBTI_Settings::get('address_label','Forio');
-$account_page = get_page_by_title('My Bookings');
-$link = $account_page ? add_query_arg(['token'=>$token,'email'=>$email], get_permalink($account_page->ID)) : home_url('/');
+$account_page_id = obti_get_page_id('My Bookings');
+$link = $account_page_id ? add_query_arg(['token'=>$token,'email'=>$email], get_permalink($account_page_id)) : home_url('/');
 ?>
 <!doctype html>
 <html>

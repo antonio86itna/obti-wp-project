@@ -21,6 +21,16 @@ require_once OBTI_PLUGIN_DIR . 'includes/class-obti-webhooks.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-cron.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-admin.php';
 
+function obti_get_page_id( $title ) {
+    $q = new WP_Query([
+        'post_type'      => 'page',
+        'title'          => $title,
+        'posts_per_page' => 1,
+        'fields'         => 'ids'
+    ]);
+    return $q->have_posts() ? intval($q->posts[0]) : 0;
+}
+
 // Activation: create pages + schedule cron + flush rewrite
 register_activation_hook(__FILE__, function(){
     if (!wp_next_scheduled('obti_cleanup_holds')) { wp_schedule_event(time()+300, 'five_minutes', 'obti_cleanup_holds'); }
@@ -40,7 +50,7 @@ function obti_maybe_create_pages(){
         'My Bookings' => '[obti_account]'
     ];
     foreach($pages as $title=>$shortcode){
-        $exists = get_page_by_title($title);
+        $exists = obti_get_page_id($title);
         if (!$exists) {
             $id = wp_insert_post([ 'post_title'=>$title, 'post_type'=>'page', 'post_status'=>'publish', 'post_content'=>$shortcode ]);
         }
