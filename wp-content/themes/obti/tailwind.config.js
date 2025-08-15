@@ -5,7 +5,12 @@ module.exports = {
     "../../plugins/obti-booking/**/*.{php,js}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      container: {
+        center: true,
+        screens: { DEFAULT: '1280px' },
+      },
+    },
   },
   plugins: [],
 }
