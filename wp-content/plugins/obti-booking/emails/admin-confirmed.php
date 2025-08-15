@@ -16,5 +16,7 @@ $total = get_post_meta($booking_id,'_obti_total', true);
     <li>Tickets: <?php echo esc_html($qty); ?></li>
     <li>Total: €<?php echo esc_html($total); ?></li>
   </ul>
-  <p><em>Powered by <a href="https://www.totaliweb.com">Totaliweb</a></em></p>
+  <p style="font-size:12px;color:#aaa;text-align:center;margin-top:20px">
+    Powered by <a href="https://www.totaliweb.com" style="color:#16a34a">Totaliweb</a>
+  </p>
 </body></html>
