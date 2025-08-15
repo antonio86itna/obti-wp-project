@@ -7,7 +7,7 @@
     var form = qs('#obti-booking-form');
     if (!form) return;
     var api = form.getAttribute('data-api');
-    var date = qs('input[name="date"]', form);
+    var date = qs("#date-picker", form);
     var time = qs('select[name="time"]', form);
     var qty  = qs('input[name="qty"]', form);
     var name = qs('input[name="name"]', form);
@@ -17,9 +17,7 @@
     var availLabel = qs('#obti-availability-label');
     var payBtn = qs('#obti-pay-btn');
 
-    // min date = today
-    var today = new Date().toISOString().split('T')[0];
-    date.setAttribute('min', today);
+    flatpickr('#date-picker', { minDate: 'today', dateFormat: 'Y-m-d' });
 
     function updateAvailability(){
       if (!date.value) return;
