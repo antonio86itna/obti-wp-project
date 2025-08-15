@@ -1,6 +1,8 @@
 module.exports = {
   content: [
-    "./**/*.php"
+    "./**/*.php",
+    "../../plugins/obti-elementor-widgets/**/*.{php,js}",
+    "../../plugins/obti-booking/**/*.{php,js}"
   ],
   theme: {
     extend: {},
