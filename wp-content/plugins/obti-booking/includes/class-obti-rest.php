@@ -132,6 +132,22 @@ class OBTI_REST {
             return new WP_REST_Response(['error'=>'missing_fields'], 400);
         }
 
+        $user = get_user_by('email', $email);
+        if ($user && !is_wp_error($user)) {
+            $user_id = $user->ID;
+        } else {
+            $user_id = wp_insert_user([
+                'user_login'   => $email,
+                'user_pass'    => wp_generate_password(),
+                'user_email'   => $email,
+                'display_name' => $name,
+                'role'         => 'obti_customer'
+            ]);
+            if (is_wp_error($user_id)) {
+                return new WP_REST_Response(['error'=>'user_create_failed'], 500);
+            }
+        }
+
         // Availability check
         $av = self::availability(new WP_REST_Request('GET', '/obti/v1/availability?date='.$date));
         $av = $av instanceof WP_REST_Response ? $av->get_data() : $av;
@@ -171,6 +187,7 @@ class OBTI_REST {
         update_post_meta($post_id, '_obti_email', $email);
         update_post_meta($post_id, '_obti_name', $name);
         update_post_meta($post_id, '_obti_currency', $currency);
+        update_post_meta($post_id, '_obti_user_id', $user_id);
         update_post_meta($post_id, '_obti_hold_expires', $hold_expires);
         $token = wp_generate_password(32,false,false);
         update_post_meta($post_id, '_obti_manage_token', $token);
