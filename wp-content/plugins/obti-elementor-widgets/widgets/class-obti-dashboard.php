@@ -14,6 +14,8 @@ class Dashboard extends Widget_Base {
     protected function register_controls(){ }
 
     protected function render(){
+        // Dashboard scripts now fetch profile and bookings for the logged-in user
+        // ensuring bookings are associated with the stored _obti_user_id.
         wp_enqueue_script('obti-dashboard');
         $api = esc_url( rest_url('obti/v1') );
         ?>
