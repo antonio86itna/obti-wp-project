@@ -55,23 +55,74 @@ class Schedule_Map extends Widget_Base {
           window.addEventListener('load', function(){
             mapboxgl.accessToken = '<?php echo esc_js($token); ?>';
             const routeCoordinates = [
-              [13.860, 40.739],
-              [13.883, 40.750],
-              [13.908, 40.750],
-              [13.943, 40.744],
-              [13.940, 40.715],
-              [13.883, 40.706],
-              [13.860, 40.739]
+              [13.9279062, 40.7397295],
+              [13.9334964, 40.7309082],
+              [13.9378331, 40.729492],
+              [13.9398668, 40.7265201],
+              [13.9393364, 40.7217948],
+              [13.9554922, 40.7089286],
+              [13.9599594, 40.7110482],
+              [13.9651812, 40.7124531],
+              [13.9647681, 40.718261],
+              [13.9606132, 40.7229789],
+              [13.9596382, 40.7258825],
+              [13.9603299, 40.7276555],
+              [13.9596921, 40.7300274],
+              [13.95963, 40.7307912],
+              [13.9599744, 40.731048],
+              [13.9602217, 40.7312495],
+              [13.9606025, 40.7315663],
+              [13.9612724, 40.7318143],
+              [13.9617532, 40.7317898],
+              [13.962478, 40.7317471],
+              [13.962121, 40.7319514],
+              [13.9615693, 40.7320079],
+              [13.9613207, 40.7320628],
+              [13.960111, 40.7322528],
+              [13.9592665, 40.7326659],
+              [13.9586164, 40.7332187],
+              [13.9582086, 40.7336755],
+              [13.9569399, 40.7341262],
+              [13.9557069, 40.7366631],
+              [13.9552236, 40.7393084],
+              [13.9548584, 40.7409853],
+              [13.9545423, 40.7412579],
+              [13.9540449, 40.7417892],
+              [13.9531137, 40.7423284],
+              [13.9530849, 40.7423508],
+              [13.9527929, 40.7427226],
+              [13.9526486, 40.7426797],
+              [13.9519234, 40.7426666],
+              [13.9508797, 40.742893],
+              [13.9505058, 40.7429365],
+              [13.9456319, 40.7452632],
+              [13.9450408, 40.7456767],
+              [13.9429702, 40.7463919],
+              [13.9426257, 40.7450864],
+              [13.9392805, 40.7457468],
+              [13.9411172, 40.7466588],
+              [13.9420155, 40.7479559],
+              [13.9423832, 40.7483362],
+              [13.9414994, 40.7478906],
+              [13.9410998, 40.7469976],
+              [13.9399506, 40.7466583],
+              [13.9393339, 40.7471424],
+              [13.9377205, 40.7468851],
+              [13.9369191, 40.7472293],
+              [13.9279062, 40.7397295]
             ];
 
             const map = new mapboxgl.Map({
               container: 'mapbox-map',
-              style: 'mapbox://styles/mapbox/streets-v12',
-              center: routeCoordinates[0],
-              zoom: 11
+              style: 'mapbox://styles/mapbox/streets-v12'
             });
 
             map.on('load', function(){
+              const bounds = routeCoordinates.reduce(
+                (bounds, coord) => bounds.extend(coord),
+                new mapboxgl.LngLatBounds(routeCoordinates[0], routeCoordinates[0])
+              );
+              map.fitBounds(bounds, {padding: 20});
               map.addSource('route', {
                 type: 'geojson',
                 data: {
@@ -99,11 +150,12 @@ class Schedule_Map extends Widget_Base {
               const line = turf.lineString(routeCoordinates);
               const length = turf.length(line);
               let progress = 0;
+              const speed = 0.0015;
               function animate(){
-                const point = turf.along(line, progress, {units:'kilometers'}).geometry.coordinates;
+                progress += speed;
+                if(progress > 1){ progress = 0; }
+                const point = turf.along(line, length * progress, {units:'kilometers'}).geometry.coordinates;
                 marker.setLngLat(point);
-                progress += 0.05;
-                if(progress > length){ progress = 0; }
                 requestAnimationFrame(animate);
               }
               animate();
