@@ -26,6 +26,11 @@ class OBTI_REST {
             'callback' => [__CLASS__, 'bookings'],
             'permission_callback' => [__CLASS__, 'auth']
         ]);
+        register_rest_route('obti/v1', '/capacity-override/(?P<id>[\w-]+)', [
+            'methods' => 'DELETE',
+            'callback' => [__CLASS__, 'delete_capacity_override'],
+            'permission_callback' => [__CLASS__, 'auth']
+        ]);
         register_rest_route('obti/v1', '/bookings/(?P<id>\d+)/transfer', [
             'methods' => 'PATCH',
             'callback' => [__CLASS__, 'mark_transfer'],
@@ -62,12 +67,36 @@ class OBTI_REST {
         $capacity_default = intval($o['capacity']);
         $cutoff = intval($o['cutoff_min']);
         $tz = obti_wp_timezone_string();
+        $overrides = OBTI_Settings::get('capacity_overrides', []);
+        if ($overrides && (!is_array(reset($overrides)) || !isset(reset($overrides)['id']))) {
+            $converted = [];
+            foreach($overrides as $k=>$v){
+                $parts = explode(' ', $k);
+                $d = $parts[0] ?? '';
+                $t = $parts[1] ?? '';
+                if ($d && $t){
+                    $converted[] = ['id'=>uniqid(),'from'=>$d,'to'=>$d,'times'=>[$t],'capacity'=>intval($v)];
+                }
+            }
+            $overrides = $converted;
+            OBTI_Settings::update('capacity_overrides', $overrides);
+        }
         $slots = [];
         foreach($times as $t){
-            $key = $date.' '.$t;
             $capacity = $capacity_default;
-            $over = OBTI_Settings::get('capacity_overrides', []);
-            if (isset($over[$key])) $capacity = intval($over[$key]);
+            if ($overrides && is_array($overrides)) {
+                foreach($overrides as $ov){
+                    $from = $ov['from'] ?? '';
+                    $to   = $ov['to'] ?? $from;
+                    $ov_times = $ov['times'] ?? [];
+                    if ($from && $to && $date >= $from && $date <= $to) {
+                        if (empty($ov_times) || in_array($t, $ov_times)) {
+                            $capacity = intval($ov['capacity']);
+                            break;
+                        }
+                    }
+                }
+            }
             // Sum booked seats
             $booked = self::sum_booked($date, $t);
             $available = max(0, $capacity - $booked);
@@ -246,6 +275,26 @@ class OBTI_REST {
         $status = sanitize_text_field($req->get_param('status') ?: 'yes');
         update_post_meta($id, '_obti_fee_transferred', $status);
         return ['id' => $id, 'transfer_status' => $status];
+    }
+
+    public static function delete_capacity_override($req){
+        $id = sanitize_text_field($req['id'] ?? '');
+        if (!$id) return new WP_REST_Response(['error'=>'not_found'], 404);
+        $overrides = OBTI_Settings::get('capacity_overrides', []);
+        $new = [];
+        $removed = false;
+        foreach($overrides as $ov){
+            if (($ov['id'] ?? '') === $id){
+                $removed = true;
+                continue;
+            }
+            $new[] = $ov;
+        }
+        if ($removed){
+            OBTI_Settings::update('capacity_overrides', $new);
+            return ['id'=>$id,'deleted'=>true];
+        }
+        return new WP_REST_Response(['error'=>'not_found'], 404);
     }
 
     public static function cancel($req){
