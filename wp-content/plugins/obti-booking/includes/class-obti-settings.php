@@ -19,6 +19,7 @@ class OBTI_Settings {
             'stripe_secret_key' => '',
             'stripe_publishable_key' => '',
             'stripe_webhook_secret' => '',
+            'google_reviews_url' => '',
             // Connect (optional - advanced)
             'connect_enabled' => 0,
             'connect_platform_secret_key' => '',
@@ -86,6 +87,9 @@ class OBTI_Admin_Settings_Page {
             $value[$k] = isset($value[$k]) ? sanitize_text_field($value[$k]) : $defaults[$k];
         }
 
+        // URL settings
+        $value['google_reviews_url'] = isset($value['google_reviews_url']) ? esc_url_raw($value['google_reviews_url']) : $defaults['google_reviews_url'];
+
         // Times array: comma separated HH:MM values
         $raw_times = $_POST['obti_settings']['times'] ?? [];
         if (is_string($raw_times)) {
@@ -141,8 +145,10 @@ class OBTI_Admin_Settings_Page {
                 <td><input type="text" size="60" name="obti_settings[stripe_secret_key]" value="<?php echo esc_attr($o['stripe_secret_key']); ?>"></td></tr>
               <tr><th><?php esc_html_e('Stripe Publishable Key','obti'); ?></th>
                 <td><input type="text" size="60" name="obti_settings[stripe_publishable_key]" value="<?php echo esc_attr($o['stripe_publishable_key']); ?>"></td></tr>
-              <tr><th><?php esc_html_e('Stripe Webhook Secret','obti'); ?></th>
+            <tr><th><?php esc_html_e('Stripe Webhook Secret','obti'); ?></th>
                 <td><input type="text" size="60" name="obti_settings[stripe_webhook_secret]" value="<?php echo esc_attr($o['stripe_webhook_secret']); ?>"></td></tr>
+              <tr><th><?php esc_html_e('Google Reviews link','obti'); ?></th>
+                <td><input type="url" size="60" name="obti_settings[google_reviews_url]" value="<?php echo esc_attr($o['google_reviews_url']); ?>"></td></tr>
               <tr><th><?php esc_html_e('Stripe Connect — Enabled','obti'); ?></th>
                 <td><input type="checkbox" name="obti_settings[connect_enabled]" value="1" <?php checked(!empty($o['connect_enabled'])); ?>></td></tr>
               <tr><th><?php esc_html_e('Connect Platform Secret Key (Totaliweb)','obti'); ?></th>
