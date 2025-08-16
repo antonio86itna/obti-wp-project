@@ -18,19 +18,10 @@
         e.preventDefault();
         var t = a.getAttribute('data-tab');
         show(t);
+        history.replaceState(null, '', '?tab=' + t);
         if(t === 'bookings'){ loadBookings(); }
       });
     });
-
-    var avatarBtn = qs('#obti-avatar-btn', wrap);
-    var avatarMenu = qs('#obti-avatar-menu', wrap);
-    if(avatarBtn && avatarMenu){
-      avatarBtn.addEventListener('click', function(e){
-        e.stopPropagation();
-        avatarMenu.classList.toggle('hidden');
-      });
-      document.addEventListener('click', function(){ avatarMenu.classList.add('hidden'); });
-    }
 
     var modal = qs('#obti-booking-modal');
     var closeModal = function(){ modal.classList.add('hidden'); };
@@ -131,6 +122,7 @@
     }
 
     loadBookings();
-    show('dashboard');
+    var initialTab = new URLSearchParams(location.search).get('tab') || 'dashboard';
+    show(initialTab);
   });
 })();
