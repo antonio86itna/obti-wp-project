@@ -5,6 +5,8 @@ class OBTI_Cron {
     public static function init(){
         add_action('obti_cleanup_holds', [__CLASS__, 'cleanup']);
         add_action('init', [__CLASS__, 'tick_status']);
+        add_action('transition_post_status', [__CLASS__, 'schedule_booking_start'], 10, 3);
+        add_action('obti_booking_start', [__CLASS__, 'handle_booking_start']);
     }
     // Remove expired holds
     public static function cleanup(){
@@ -21,26 +23,53 @@ class OBTI_Cron {
             }
         }
     }
-    // Move confirmed bookings to in_progress/completed based on time
+    // Move bookings to completed based on time
     public static function tick_status(){
         $o = OBTI_Settings::get_all();
         $duration = intval($o['duration_min']);
         $tz = obti_wp_timezone_string();
-        // In progress
         $q = new WP_Query([
             'post_type'=>'obti_booking',
-            'post_status'=>['obti-confirmed'],
+            'post_status'=>['obti-confirmed','obti-in-progress'],
             'posts_per_page'=>-1,
             'fields'=>'ids'
         ]);
         foreach($q->posts as $id){
             $start = strtotime(get_post_meta($id,'_obti_date', true).' '.get_post_meta($id,'_obti_time', true).' '.$tz);
-            if (time() >= $start && time() < ($start + $duration*60)){
-                wp_update_post(['ID'=>$id, 'post_status'=>'obti-in-progress']);
-            } elseif (time() >= ($start + $duration*60)){
+            if (time() >= ($start + $duration*60)){
                 wp_update_post(['ID'=>$id, 'post_status'=>'obti-completed']);
             }
         }
+    }
+
+    public static function schedule_booking_start($new_status, $old_status, $post){
+        if ($post->post_type !== 'obti_booking') return;
+        wp_clear_scheduled_hook('obti_booking_start', [$post->ID]);
+        if ($new_status !== 'obti-confirmed') return;
+        $date = get_post_meta($post->ID,'_obti_date', true);
+        $time = get_post_meta($post->ID,'_obti_time', true);
+        if (!$date || !$time) return;
+        $ts = strtotime($date.' '.$time.' '.obti_wp_timezone_string());
+        if ($ts){
+            wp_schedule_single_event($ts, 'obti_booking_start', [$post->ID]);
+        }
+    }
+
+    public static function handle_booking_start($booking_id){
+        if (get_post_status($booking_id) !== 'obti-confirmed') return;
+        wp_update_post(['ID'=>$booking_id, 'post_status'=>'obti-in-progress']);
+        self::email_customer_onboard($booking_id);
+    }
+
+    private static function email_customer_onboard($booking_id){
+        $to = get_post_meta($booking_id,'_obti_email', true);
+        if (!$to) return;
+        $subject = __('Benvenuto a bordo','obti');
+        $ebook_url = apply_filters('obti_booking_ebook_url', '#');
+        $html = OBTI_Webhooks::render_email_template('customer-onboard.php', $booking_id, ['ebook_url'=>$ebook_url]);
+        add_filter('wp_mail_content_type', function(){ return 'text/html; charset=UTF-8'; });
+        wp_mail($to, $subject, $html);
+        remove_filter('wp_mail_content_type', '__return_false');
     }
 }
 OBTI_Cron::init();
