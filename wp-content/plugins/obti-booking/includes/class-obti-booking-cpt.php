@@ -42,6 +42,8 @@ class OBTI_Booking_CPT {
             $cols['date_time'] = __('Date/Time','obti');
             $cols['qty'] = __('Qty','obti');
             $cols['customer'] = __('Customer','obti');
+            $cols['service_fee'] = __('Service fee','obti');
+            $cols['agency_fee'] = __('Agency fee','obti');
             $cols['total'] = __('Total','obti');
             return $cols;
         });
@@ -52,6 +54,10 @@ class OBTI_Booking_CPT {
                 echo intval(get_post_meta($post_id,'_obti_qty', true));
             } elseif ($col === 'customer'){
                 echo esc_html(get_post_meta($post_id,'_obti_name', true).' <'.get_post_meta($post_id,'_obti_email', true).'>');
+            } elseif ($col === 'service_fee'){
+                echo '€'.esc_html(get_post_meta($post_id,'_obti_service_fee', true));
+            } elseif ($col === 'agency_fee'){
+                echo '€'.esc_html(get_post_meta($post_id,'_obti_agency_fee', true));
             } elseif ($col === 'total'){
                 echo '€'.esc_html(get_post_meta($post_id,'_obti_total', true));
             }

@@ -10,8 +10,9 @@ class OBTI_Checkout {
         $qty   = intval(get_post_meta($booking_id,'_obti_qty', true));
         $unit  = floatval(get_post_meta($booking_id,'_obti_unit_price', true));
         $subtotal = floatval(get_post_meta($booking_id,'_obti_subtotal', true));
-        $service_fee = floatval(get_post_meta($booking_id,'_obti_service_fee', true));
+        $base_service_fee = floatval(get_post_meta($booking_id,'_obti_service_fee', true));
         $agency_fee  = floatval(get_post_meta($booking_id,'_obti_agency_fee', true));
+        $service_fee = $base_service_fee + $agency_fee;
         $total = floatval(get_post_meta($booking_id,'_obti_total', true));
         $currency = strtolower(get_post_meta($booking_id,'_obti_currency', true) ?: 'eur');
 
