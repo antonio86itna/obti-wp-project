@@ -12,6 +12,11 @@
         dropdowns.forEach(function(obj){ if (obj.menu !== menu) obj.menu.classList.add('hidden'); });
         menu.classList.toggle('hidden');
       });
+      menu.querySelectorAll('a').forEach(function(link){
+        link.addEventListener('click', function(){
+          menu.classList.add('hidden');
+        });
+      });
     });
     document.addEventListener('click', function(e){
       dropdowns.forEach(function(obj){
