@@ -1,14 +1,22 @@
 <?php
-$booking_id = $booking_id ?? 0;
-$name  = get_post_meta($booking_id,'_obti_name', true);
-$date  = get_post_meta($booking_id,'_obti_date', true);
-$time  = get_post_meta($booking_id,'_obti_time', true);
+$booking_id   = $booking_id ?? 0;
+$name         = get_post_meta( $booking_id, '_obti_name', true );
+$date         = get_post_meta( $booking_id, '_obti_date', true );
+$time         = get_post_meta( $booking_id, '_obti_time', true );
+$checkout_url = $checkout_url ?? '#';
+$email        = get_post_meta( $booking_id, '_obti_email', true );
+$token        = get_post_meta( $booking_id, '_obti_manage_token', true );
+$account_page_id = obti_get_page_id( 'My Bookings' );
+$dashboard_url = $account_page_id ? add_query_arg( ['token' => $token, 'email' => $email], get_permalink( $account_page_id ) ) : home_url( '/' );
 ?>
-<!doctype html>
-<html><body style="font-family:Inter,Arial,sans-serif;background:#ffffff;padding:16px;">
-  <h2>Booking Cancelled</h2>
-  <p>Hi <?php echo esc_html($name); ?>, your booking #<?php echo intval($booking_id); ?> for <?php echo esc_html($date.' '.$time); ?> has been cancelled. A refund has been initiated.</p>
-  <p style="font-size:12px;color:#aaa;text-align:center;margin-top:20px">
-    Powered by <a href="https://www.totaliweb.com" style="color:#16a34a">Totaliweb</a>
-  </p>
-</body></html>
+<?php include __DIR__ . '/partials/header.php'; ?>
+<h2 style="margin:0 0 8px 0;">
+  <?php echo esc_html__( 'Booking Cancelled', 'obti' ); ?>
+</h2>
+<p style="margin:0 0 16px 0;">
+  <?php echo sprintf( esc_html__( 'Hi %1$s, your booking #%2$s for %3$s at %4$s has been cancelled. A refund has been initiated.', 'obti' ), esc_html( $name ), intval( $booking_id ), esc_html( $date ), esc_html( $time ) ); ?>
+</p>
+<p style="margin:0 0 16px 0;">
+  <?php printf( esc_html__( 'Manage your booking: %s', 'obti' ), '<a href="' . esc_url( $dashboard_url ) . '" style="color:#16a34a;">' . esc_html__( 'Dashboard', 'obti' ) . '</a>' ); ?>
+</p>
+<?php include __DIR__ . '/partials/footer.php'; ?>
