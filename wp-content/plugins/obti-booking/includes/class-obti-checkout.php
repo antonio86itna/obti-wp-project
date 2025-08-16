@@ -6,13 +6,21 @@ class OBTI_Checkout {
     /**
      * Ensure a user exists for the given email. If the email is not associated
      * with an account, a new user is created with the `obti_customer` role and
-     * a random password. A welcome email with the credentials is sent to the
-     * customer. Returns the user ID or a WP_Error on failure.
+     * a random password. The user's first name, last name and display name are
+     * updated. A welcome email with the credentials is sent to the customer.
+     * Returns the user ID or a WP_Error on failure.
      */
-    public static function ensure_customer($email, $name = ''){
+    public static function ensure_customer($email, $first_name = '', $last_name = ''){
         $email = sanitize_email($email);
         $user  = get_user_by('email', $email);
+        $display_name = trim($first_name . ' ' . $last_name);
         if ($user && ! is_wp_error($user)) {
+            wp_update_user([
+                'ID'         => $user->ID,
+                'first_name' => $first_name,
+                'last_name'  => $last_name,
+                'display_name' => $display_name,
+            ]);
             return $user->ID;
         }
 
@@ -24,14 +32,16 @@ class OBTI_Checkout {
 
         wp_update_user([
             'ID'           => $user_id,
-            'display_name' => $name,
+            'first_name'   => $first_name,
+            'last_name'    => $last_name,
+            'display_name' => $display_name,
             'role'         => 'obti_customer',
         ]);
 
         $subject = __('Welcome to Open Bus Tour Ischia', 'obti');
         $message = sprintf(
             __("Hi %s,\n\nYour account has been created.\nLogin: %s\nPassword: %s\n\nThank you!", 'obti'),
-            $name,
+            $display_name,
             $email,
             $password
         );
@@ -88,6 +98,28 @@ class OBTI_Checkout {
         $platform_secret = OBTI_Settings::get('connect_platform_secret_key','');
         $connected = OBTI_Settings::get('connect_client_account_id','');
 
+        $user_id = intval(get_post_meta($booking_id,'_obti_user_id', true));
+        $stripe_customer = $user_id ? get_user_meta($user_id, '_obti_stripe_customer_id', true) : '';
+        if (!$stripe_customer){
+            $cust_res = wp_remote_post('https://api.stripe.com/v1/customers', [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$secret,
+                    'Content-Type'  => 'application/x-www-form-urlencoded'
+                ],
+                'body'    => http_build_query(['email'=>$email,'name'=>$name]),
+                'timeout' => 45
+            ]);
+            if (is_wp_error($cust_res)) return $cust_res;
+            $code_cust = wp_remote_retrieve_response_code($cust_res);
+            $json_cust = json_decode(wp_remote_retrieve_body($cust_res), true);
+            if ($code_cust >= 200 && $code_cust < 300 && !empty($json_cust['id'])){
+                $stripe_customer = $json_cust['id'];
+                if ($user_id) update_user_meta($user_id, '_obti_stripe_customer_id', $stripe_customer);
+            } else {
+                return new WP_Error('stripe_error', __('Stripe error: ','obti').wp_remote_retrieve_body($cust_res));
+            }
+        }
+
         $headers = [
             'Authorization' => 'Bearer '.$secret,
             'Content-Type'  => 'application/x-www-form-urlencoded'
@@ -96,7 +128,7 @@ class OBTI_Checkout {
             'mode' => 'payment',
             'success_url' => $success_url,
             'cancel_url'  => $cancel_url,
-            'customer_email' => $email,
+            'customer' => $stripe_customer,
             'client_reference_id' => $booking_id,
             'metadata[booking_id]' => $booking_id,
         ];

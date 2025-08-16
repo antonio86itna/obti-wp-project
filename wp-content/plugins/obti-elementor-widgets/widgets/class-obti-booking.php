@@ -24,12 +24,14 @@ class Booking extends Widget_Base {
         wp_enqueue_script('obti-booking-widget');
         $ajax = esc_url( rest_url('obti/v1') );
         $user_id = 0;
-        $user_name = '';
+        $user_first_name = '';
+        $user_last_name  = '';
         $user_email = '';
         if ( is_user_logged_in() ) {
             $u = wp_get_current_user();
             $user_id = $u->ID;
-            $user_name = $u->display_name;
+            $user_first_name = $u->first_name;
+            $user_last_name  = $u->last_name;
             $user_email = $u->user_email;
         }
         ?>
@@ -41,7 +43,7 @@ class Booking extends Widget_Base {
             </div>
             <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden md:flex">
               <div class="md:w-1/2 p-8 md:p-12">
-                <form id="obti-booking-form" data-api="<?php echo $ajax; ?>"<?php if ($user_id) { echo ' data-user="' . esc_attr($user_id) . '" data-name="' . esc_attr($user_name) . '" data-email="' . esc_attr($user_email) . '"'; } ?>>
+                <form id="obti-booking-form" data-api="<?php echo $ajax; ?>"<?php if ($user_id) { echo ' data-user="' . esc_attr($user_id) . '" data-first-name="' . esc_attr($user_first_name) . '" data-last-name="' . esc_attr($user_last_name) . '" data-email="' . esc_attr($user_email) . '"'; } ?>>
                   <div class="space-y-6">
                     <div>
                       <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Date','obti'); ?></label>
@@ -63,8 +65,12 @@ class Booking extends Widget_Base {
                       <input type="number" name="qty" min="1" value="1" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
                     </div>
                     <div>
-                      <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Full Name','obti'); ?></label>
-                      <input type="text" name="name" value="<?php echo esc_attr( $user_name ); ?>" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
+                      <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('First Name','obti'); ?></label>
+                      <input type="text" name="first_name" value="<?php echo esc_attr( $user_first_name ); ?>" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Last Name','obti'); ?></label>
+                      <input type="text" name="last_name" value="<?php echo esc_attr( $user_last_name ); ?>" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Email','obti'); ?></label>
