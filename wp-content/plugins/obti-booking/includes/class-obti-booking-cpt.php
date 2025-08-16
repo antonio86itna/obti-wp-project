@@ -39,12 +39,13 @@ class OBTI_Booking_CPT {
         }
         // Columns
         add_filter('manage_obti_booking_posts_columns', function($cols){
-            $cols['date_time'] = __('Date/Time','obti');
-            $cols['qty'] = __('Qty','obti');
-            $cols['customer'] = __('Customer','obti');
-            $cols['service_fee'] = __('Service fee','obti');
+            $cols['date_time']  = __('Date/Time','obti');
+            $cols['qty']        = __('Qty','obti');
+            $cols['customer']   = __('Customer','obti');
+            $cols['total']      = __('Total','obti');
+            $cols['service_fee']= __('Service fee','obti');
             $cols['agency_fee'] = __('Agency fee','obti');
-            $cols['total'] = __('Total','obti');
+            $cols['net']        = __('Net','obti');
             return $cols;
         });
         add_action('manage_obti_booking_posts_custom_column', function($col, $post_id){
@@ -54,12 +55,18 @@ class OBTI_Booking_CPT {
                 echo intval(get_post_meta($post_id,'_obti_qty', true));
             } elseif ($col === 'customer'){
                 echo esc_html(get_post_meta($post_id,'_obti_name', true).' <'.get_post_meta($post_id,'_obti_email', true).'>');
+            } elseif ($col === 'total'){
+                echo '€'.esc_html(get_post_meta($post_id,'_obti_total', true));
             } elseif ($col === 'service_fee'){
                 echo '€'.esc_html(get_post_meta($post_id,'_obti_service_fee', true));
             } elseif ($col === 'agency_fee'){
                 echo '€'.esc_html(get_post_meta($post_id,'_obti_agency_fee', true));
-            } elseif ($col === 'total'){
-                echo '€'.esc_html(get_post_meta($post_id,'_obti_total', true));
+            } elseif ($col === 'net'){
+                $total       = floatval(get_post_meta($post_id,'_obti_total', true));
+                $service_fee = floatval(get_post_meta($post_id,'_obti_service_fee', true));
+                $agency_fee  = floatval(get_post_meta($post_id,'_obti_agency_fee', true));
+                $net = $total - $service_fee - $agency_fee;
+                echo '€'.esc_html(number_format($net,2,'.',''));
             }
         }, 10, 2);
     }

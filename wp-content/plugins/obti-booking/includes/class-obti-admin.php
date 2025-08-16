@@ -25,26 +25,44 @@ class OBTI_Admin {
         add_meta_box('obti_booking_meta', __('Booking Details','obti'), [__CLASS__,'render_meta'], 'obti_booking', 'normal', 'high');
     }
     public static function render_meta($post){
-        $fields = [
+        $details = [
             'date' => get_post_meta($post->ID,'_obti_date', true),
             'time' => get_post_meta($post->ID,'_obti_time', true),
             'qty'  => get_post_meta($post->ID,'_obti_qty', true),
             'unit' => get_post_meta($post->ID,'_obti_unit_price', true),
-            'subtotal' => get_post_meta($post->ID,'_obti_subtotal', true),
-            'service_fee' => get_post_meta($post->ID,'_obti_service_fee', true),
-            'agency_fee' => get_post_meta($post->ID,'_obti_agency_fee', true),
-            'total'=> get_post_meta($post->ID,'_obti_total', true),
-            'fee_transferred' => get_post_meta($post->ID,'_obti_fee_transferred', true),
             'email'=> get_post_meta($post->ID,'_obti_email', true),
             'name' => get_post_meta($post->ID,'_obti_name', true),
             'session' => get_post_meta($post->ID,'_obti_stripe_session_id', true),
             'payment_intent' => get_post_meta($post->ID,'_obti_payment_intent', true),
+            'fee_transferred' => get_post_meta($post->ID,'_obti_fee_transferred', true),
         ];
+
         echo '<table class="form-table">';
-        foreach($fields as $k=>$v){
+        foreach($details as $k=>$v){
             echo '<tr><th>'.esc_html($k).'</th><td><input type="text" readonly value="'.esc_attr($v).'" style="width:100%"></td></tr>';
         }
         echo '</table>';
+
+        $subtotal    = get_post_meta($post->ID,'_obti_subtotal', true);
+        $service_fee = get_post_meta($post->ID,'_obti_service_fee', true);
+        $agency_fee  = get_post_meta($post->ID,'_obti_agency_fee', true);
+        $total       = get_post_meta($post->ID,'_obti_total', true);
+        $net         = number_format((float)$total - (float)$service_fee - (float)$agency_fee, 2, '.', '');
+
+        echo '<h2>'.esc_html__('Cost Breakdown','obti').'</h2>';
+        echo '<table class="form-table">';
+        $costs = [
+            __('Subtotal','obti')     => $subtotal,
+            __('Service fee','obti')  => $service_fee,
+            __('Agency fee','obti')   => $agency_fee,
+            __('Total','obti')        => $total,
+            __('Net','obti')          => $net,
+        ];
+        foreach($costs as $label=>$v){
+            echo '<tr><th>'.esc_html($label).'</th><td><input type="text" readonly value="'.esc_attr($v).'" style="width:100%"></td></tr>';
+        }
+        echo '</table>';
+
         wp_nonce_field('obti_booking_meta','obti_booking_meta_nonce');
     }
     public static function save_meta($post_id, $post){
