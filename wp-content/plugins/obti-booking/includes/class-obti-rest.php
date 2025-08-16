@@ -36,6 +36,27 @@ class OBTI_REST {
             'callback' => [__CLASS__, 'mark_transfer'],
             'permission_callback' => [__CLASS__, 'auth']
         ]);
+
+        register_rest_route('obti/v1', '/me', [
+            'methods' => 'GET',
+            'callback' => [__CLASS__, 'me'],
+            'permission_callback' => [__CLASS__, 'auth_user']
+        ]);
+        register_rest_route('obti/v1', '/me', [
+            'methods' => 'POST',
+            'callback' => [__CLASS__, 'update_me'],
+            'permission_callback' => [__CLASS__, 'auth_user']
+        ]);
+        register_rest_route('obti/v1', '/password', [
+            'methods' => 'POST',
+            'callback' => [__CLASS__, 'change_password'],
+            'permission_callback' => [__CLASS__, 'auth_user']
+        ]);
+        register_rest_route('obti/v1', '/my-bookings', [
+            'methods' => 'GET',
+            'callback' => [__CLASS__, 'my_bookings'],
+            'permission_callback' => [__CLASS__, 'auth_user']
+        ]);
     }
 
     public static function auth($req){
@@ -53,6 +74,13 @@ class OBTI_REST {
             return true;
         }
         if (is_user_logged_in() && current_user_can('manage_options')) {
+            return true;
+        }
+        return new WP_Error('forbidden', __('Unauthorized', 'obti'), ['status' => 401]);
+    }
+
+    public static function auth_user(){
+        if (is_user_logged_in()) {
             return true;
         }
         return new WP_Error('forbidden', __('Unauthorized', 'obti'), ['status' => 401]);
@@ -206,6 +234,60 @@ class OBTI_REST {
         return ['checkout_url'=>$checkout['url'], 'booking_id'=>$post_id];
     }
 
+    public static function me($req){
+        $u = wp_get_current_user();
+        return ['first_name'=>$u->first_name,'last_name'=>$u->last_name,'email'=>$u->user_email];
+    }
+
+    public static function update_me($req){
+        $params = json_decode($req->get_body(), true);
+        if (!is_array($params)) $params = $req->get_params();
+        $user_id = get_current_user_id();
+        $data = ['ID'=>$user_id];
+        if (!empty($params['email'])) $data['user_email'] = sanitize_email($params['email']);
+        if (!empty($params['first_name'])) $data['first_name'] = sanitize_text_field($params['first_name']);
+        if (!empty($params['last_name'])) $data['last_name'] = sanitize_text_field($params['last_name']);
+        $res = wp_update_user($data);
+        if (is_wp_error($res)) return new WP_REST_Response(['error'=>'update_failed'], 400);
+        return self::me($req);
+    }
+
+    public static function change_password($req){
+        $params = json_decode($req->get_body(), true);
+        if (!is_array($params)) $params = $req->get_params();
+        $password = sanitize_text_field($params['password'] ?? '');
+        if(!$password) return new WP_REST_Response(['error'=>'missing_password'], 400);
+        wp_set_password($password, get_current_user_id());
+        return ['ok'=>true];
+    }
+
+    public static function my_bookings($req){
+        $user_id = get_current_user_id();
+        $args = [
+            'post_type' => 'obti_booking',
+            'posts_per_page' => -1,
+            'post_status' => ['obti-confirmed','obti-in-progress','obti-pending','obti-cancelled'],
+            'meta_query' => [
+                ['key' => '_obti_user_id', 'value' => $user_id, 'compare' => '='],
+            ],
+        ];
+        $posts = get_posts($args);
+        $items = [];
+        foreach($posts as $p){
+            $id = $p->ID;
+            $items[] = [
+                'id' => $id,
+                'title' => get_the_title($id),
+                'date' => get_post_meta($id, '_obti_date', true),
+                'time' => get_post_meta($id, '_obti_time', true),
+                'qty' => intval(get_post_meta($id, '_obti_qty', true)),
+                'total' => floatval(get_post_meta($id, '_obti_total', true)),
+                'status' => get_post_status($id),
+                'token' => get_post_meta($id, '_obti_manage_token', true),
+            ];
+        }
+        return $items;
+    }
     public static function bookings($req){
         $date = sanitize_text_field($req->get_param('date'));
         $status = sanitize_text_field($req->get_param('status'));

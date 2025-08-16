@@ -60,20 +60,51 @@
     var nameInput = qs('#obti-profile-name', wrap);
     var emailInput = qs('#obti-profile-email', wrap);
     var saveBtn = qs('#obti-profile-save', wrap);
+    var newPassInput = qs('#obti-new-password', wrap);
+    var confirmPassInput = qs('#obti-confirm-password', wrap);
+    var passSaveBtn = qs('#obti-password-save', wrap);
+
+    function loadProfile(){
+      fetch(api + '/me')
+        .then(function(r){ return r.json(); })
+        .then(function(u){
+          if(nameInput){ nameInput.value = [u.first_name||'', u.last_name||''].join(' ').trim(); }
+          if(emailInput){ emailInput.value = u.email||''; }
+        }).catch(function(){});
+    }
+    loadProfile();
+
     if(saveBtn){
       saveBtn.addEventListener('click', function(){
-        try{
-          localStorage.setItem('obti_name', nameInput.value);
-          localStorage.setItem('obti_email', emailInput.value);
-        }catch(e){}
-        alert('Profilo aggiornato');
+        var full = nameInput.value.trim().split(' ');
+        var first = full.shift()||'';
+        var last = full.join(' ');
+        fetch(api + '/me', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({first_name:first,last_name:last,email:emailInput.value.trim()})
+        }).then(function(){ alert('Profilo aggiornato'); }).catch(function(){});
+      });
+    }
+    if(passSaveBtn){
+      passSaveBtn.addEventListener('click', function(){
+        var p1 = newPassInput.value;
+        var p2 = confirmPassInput.value;
+        if(p1 !== p2 || !p1){ alert('Le password non coincidono'); return; }
+        fetch(api + '/password', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({password:p1})
+        }).then(function(){
+          alert('Password aggiornata');
+          newPassInput.value='';
+          confirmPassInput.value='';
+        }).catch(function(){});
       });
     }
 
     function loadBookings(){
-      var email = emailInput.value.trim();
-      if(!email) return;
-      fetch(api + '/bookings?email=' + encodeURIComponent(email))
+      fetch(api + '/my-bookings')
         .then(function(r){ return r.json(); })
         .then(function(list){
           var cont = qs('#obti-bookings-list', wrap);
@@ -99,6 +130,7 @@
         }).catch(function(){});
     }
 
+    loadBookings();
     show('dashboard');
   });
 })();
