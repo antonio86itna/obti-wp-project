@@ -64,7 +64,7 @@ class OBTI_Cron {
     private static function email_customer_reminder($booking_id){
         $to = get_post_meta($booking_id,'_obti_email', true);
         if (!$to) return;
-        $subject = __('Promemoria prenotazione','obti');
+        $subject = __('Booking Reminder','obti');
         $html = OBTI_Webhooks::render_email_template('customer-reminder.php', $booking_id);
         add_filter('wp_mail_content_type', function(){ return 'text/html; charset=UTF-8'; });
         wp_mail($to, $subject, $html);
@@ -74,7 +74,7 @@ class OBTI_Cron {
     private static function email_customer_onboard($booking_id){
         $to = get_post_meta($booking_id,'_obti_email', true);
         if (!$to) return;
-        $subject = __('Benvenuto a bordo','obti');
+        $subject = __('Welcome aboard','obti');
         $ebook_url = apply_filters('obti_booking_ebook_url', '#');
         $html = OBTI_Webhooks::render_email_template('customer-onboard.php', $booking_id, ['ebook_url'=>$ebook_url]);
         add_filter('wp_mail_content_type', function(){ return 'text/html; charset=UTF-8'; });
@@ -91,7 +91,7 @@ class OBTI_Cron {
     private static function email_customer_completed($booking_id){
         $to = get_post_meta($booking_id,'_obti_email', true);
         if (!$to) return;
-        $subject = __('Grazie per aver viaggiato con noi','obti');
+        $subject = __('Thank you for travelling with us','obti');
         $reviews_url = OBTI_Settings::get('google_reviews_url', '#');
         $html = OBTI_Webhooks::render_email_template('customer-completed.php', $booking_id, ['reviews_url'=>$reviews_url]);
         add_filter('wp_mail_content_type', function(){ return 'text/html; charset=UTF-8'; });
