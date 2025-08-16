@@ -56,7 +56,7 @@ add_action('wp_enqueue_scripts', function(){
     wp_register_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
     wp_register_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
     wp_register_script('obti-booking-widget', OBTI_EW_URL.'assets/js/booking-widget.js', ['flatpickr'], '1.0.0', true);
-    wp_register_script('obti-dashboard-widget', OBTI_EW_URL.'assets/js/dashboard-widget.js', [], '1.0.0', true);
+    wp_register_script('obti-dashboard', OBTI_EW_URL.'assets/js/dashboard.js', [], '1.0.0', true);
     wp_enqueue_script('mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', [], '2.15.0', true);
     wp_enqueue_script('turf', 'https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js', [], '6.5.0', true);
 });

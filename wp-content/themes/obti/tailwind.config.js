@@ -1,7 +1,7 @@
 module.exports = {
   content: [
     "./**/*.php",
-    "../../plugins/**/*.{php,js}"
+    "../../plugins/obti-elementor-widgets/**/*.{php,js}"
   ],
   theme: {
     extend: {
