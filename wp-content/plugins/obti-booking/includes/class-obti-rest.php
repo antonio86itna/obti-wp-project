@@ -171,8 +171,9 @@ class OBTI_REST {
         $agency_fee_percent  = floatval(OBTI_Settings::get('agency_fee_percent', 2.5));
         $unit = $price;
         $subtotal = $unit * $qty;
-        $service_fee = round($subtotal * $service_fee_percent / 100, 2);
+        $service_fee = round($subtotal * $service_fee_percent / 100, 2); // base fee
         $agency_fee = round($subtotal * $agency_fee_percent / 100, 2);
+        $service_fee_total = $service_fee + $agency_fee;
 
         $title = sprintf(__('Booking %s %s — %s','obti'), $date, $time, $name);
         $post_id = wp_insert_post([
@@ -189,7 +190,7 @@ class OBTI_REST {
         update_post_meta($post_id, '_obti_subtotal', number_format($subtotal,2,'.',''));
         update_post_meta($post_id, '_obti_service_fee', number_format($service_fee,2,'.',''));
         update_post_meta($post_id, '_obti_agency_fee', number_format($agency_fee,2,'.',''));
-        update_post_meta($post_id, '_obti_total', number_format($subtotal + $service_fee,2,'.',''));
+        update_post_meta($post_id, '_obti_total', number_format($subtotal + $service_fee_total,2,'.',''));
         update_post_meta($post_id, '_obti_email', $email);
         update_post_meta($post_id, '_obti_name', $name);
         update_post_meta($post_id, '_obti_currency', $currency);
@@ -237,6 +238,7 @@ class OBTI_REST {
                 'time' => get_post_meta($id, '_obti_time', true),
                 'qty' => intval(get_post_meta($id, '_obti_qty', true)),
                 'total' => floatval(get_post_meta($id, '_obti_total', true)),
+                'service_fee' => floatval(get_post_meta($id, '_obti_service_fee', true)),
                 'agency_fee' => floatval(get_post_meta($id, '_obti_agency_fee', true)),
                 'transfer_status' => get_post_meta($id, '_obti_fee_transferred', true),
             ];

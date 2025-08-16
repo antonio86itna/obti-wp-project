@@ -5,6 +5,8 @@ $email = get_post_meta($booking_id,'_obti_email', true);
 $date  = get_post_meta($booking_id,'_obti_date', true);
 $time  = get_post_meta($booking_id,'_obti_time', true);
 $qty   = (int) get_post_meta($booking_id,'_obti_qty', true);
+$service_fee = get_post_meta($booking_id,'_obti_service_fee', true);
+$agency_fee = get_post_meta($booking_id,'_obti_agency_fee', true);
 $total = get_post_meta($booking_id,'_obti_total', true);
 ?>
 <!doctype html>
@@ -14,6 +16,8 @@ $total = get_post_meta($booking_id,'_obti_total', true);
   <ul>
     <li>Date/Time: <?php echo esc_html($date.' '.$time); ?></li>
     <li>Tickets: <?php echo esc_html($qty); ?></li>
+    <li>Service fee: €<?php echo esc_html($service_fee); ?></li>
+    <li>Agency fee: €<?php echo esc_html($agency_fee); ?></li>
     <li>Total: €<?php echo esc_html($total); ?></li>
   </ul>
   <p style="font-size:12px;color:#aaa;text-align:center;margin-top:20px">
