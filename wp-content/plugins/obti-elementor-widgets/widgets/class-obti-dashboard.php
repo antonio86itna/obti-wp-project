@@ -32,16 +32,25 @@ class Dashboard extends Widget_Base {
                 <div id="obti-tab-dashboard" class="obti-tab">
                     <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="p-4 bg-gray-100 rounded text-center">
+                        <div class="p-4 bg-blue-100 rounded text-center">
                             <div class="text-sm text-gray-600"><?php esc_html_e('Biglietti attivi','obti'); ?></div>
                             <div id="obti-active-count" class="text-2xl font-bold">0</div>
                         </div>
-                        <div class="p-4 bg-gray-100 rounded text-center">
+                        <div class="p-4 bg-green-100 rounded text-center">
                             <div class="text-sm text-gray-600"><?php esc_html_e('Tour completati','obti'); ?></div>
                             <div id="obti-completed-count" class="text-2xl font-bold">0</div>
                         </div>
                         <div class="p-4 bg-gray-100 rounded flex items-center justify-center">
                             <a href="#" id="obti-book-btn" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Prenota','obti'); ?></a>
+                        </div>
+                    </div>
+                    <div id="obti-upcoming-card" class="hidden mb-6">
+                        <div class="flex items-center justify-between p-4 border rounded bg-white">
+                            <div>
+                                <div id="obti-upcoming-title" class="font-semibold"></div>
+                                <div id="obti-upcoming-date" class="text-sm text-gray-600"></div>
+                            </div>
+                            <div id="obti-upcoming-qr" class="w-20 h-20 bg-gray-200 rounded"></div>
                         </div>
                     </div>
                 </div>
@@ -81,7 +90,7 @@ class Dashboard extends Widget_Base {
                 <button data-close class="absolute top-2 right-2 text-gray-500">&times;</button>
                 <div id="obti-booking-details" class="space-y-2"></div>
                 <div id="obti-booking-qr" class="my-4 flex justify-center"></div>
-                <button id="obti-refund-btn" class="hidden w-full bg-red-600 text-white px-4 py-2 rounded"><?php esc_html_e('Cancella e chiedi rimborso','obti'); ?></button>
+                <button id="obti-refund-btn" class="hidden w-full bg-red-600 text-white px-4 py-2 rounded"><?php esc_html_e('Cancel & Request Refund','obti'); ?></button>
             </div>
         </div>
         <?php
