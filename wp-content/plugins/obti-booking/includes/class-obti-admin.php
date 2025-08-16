@@ -3,8 +3,23 @@ if (!defined('ABSPATH')) { exit; }
 
 class OBTI_Admin {
     public static function init(){
+        add_action('admin_init', [__CLASS__, 'redirect_non_privileged'], 1);
         add_action('admin_init', [__CLASS__, 'add_meta']);
+        add_action('after_setup_theme', [__CLASS__, 'maybe_hide_admin_bar']);
         add_action('save_post_obti_booking', [__CLASS__, 'save_meta'], 10, 2);
+    }
+    public static function redirect_non_privileged(){
+        if (wp_doing_ajax()) return;
+        if (!current_user_can('manage_options')) {
+            wp_redirect(home_url());
+            exit;
+        }
+    }
+    public static function maybe_hide_admin_bar(){
+        $user = wp_get_current_user();
+        if (in_array('obti_customer', (array) $user->roles, true)) {
+            show_admin_bar(false);
+        }
     }
     public static function add_meta(){
         add_meta_box('obti_booking_meta', __('Booking Details','obti'), [__CLASS__,'render_meta'], 'obti_booking', 'normal', 'high');
