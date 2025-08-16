@@ -23,18 +23,12 @@ class Dashboard extends Widget_Base {
             <aside class="md:w-64 border-b md:border-b-0 md:border-r">
                 <nav class="flex md:flex-col">
                     <a href="#" data-tab="dashboard" class="px-4 py-3 text-center md:text-left md:py-4 obti-tab-link">Dashboard</a>
-                    <a href="#" data-tab="bookings" class="px-4 py-3 text-center md:text-left md:py-4 obti-tab-link">Le Mie Prenotazioni</a>
-                    <a href="#" data-tab="profile" class="px-4 py-3 text-center md:text-left md:py-4 obti-tab-link">Il Mio Profilo</a>
+                    <a href="#" data-tab="bookings" class="px-4 py-3 text-center md:text-left md:py-4 obti-tab-link">My Bookings</a>
+                    <a href="#" data-tab="profile" class="px-4 py-3 text-center md:text-left md:py-4 obti-tab-link">My Profile</a>
+                    <a href="/logout" class="px-4 py-3 text-center md:text-left md:py-4 obti-tab-link">Logout</a>
                 </nav>
             </aside>
             <div class="flex-1 p-6">
-                <header class="flex justify-end mb-6 relative">
-                    <button id="obti-avatar-btn" class="w-10 h-10 rounded-full bg-gray-200"></button>
-                    <div id="obti-avatar-menu" class="hidden absolute right-0 top-full mt-2 w-40 bg-white border rounded shadow-lg">
-                        <a href="#" data-tab="profile" class="block px-4 py-2 text-sm hover:bg-gray-100">Il Mio Profilo</a>
-                        <a href="/logout" class="block px-4 py-2 text-sm hover:bg-gray-100">Logout</a>
-                    </div>
-                </header>
                 <div id="obti-tab-dashboard" class="obti-tab">
                     <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -52,11 +46,11 @@ class Dashboard extends Widget_Base {
                     </div>
                 </div>
                 <div id="obti-tab-bookings" class="obti-tab hidden">
-                    <h2 class="text-2xl font-bold mb-4"><?php esc_html_e('Le Mie Prenotazioni','obti'); ?></h2>
+                    <h2 class="text-2xl font-bold mb-4"><?php esc_html_e('My Bookings','obti'); ?></h2>
                     <ul id="obti-bookings-list" class="space-y-4"></ul>
                 </div>
                 <div id="obti-tab-profile" class="obti-tab hidden">
-                    <h2 class="text-2xl font-bold mb-4"><?php esc_html_e('Il Mio Profilo','obti'); ?></h2>
+                    <h2 class="text-2xl font-bold mb-4"><?php esc_html_e('My Profile','obti'); ?></h2>
                     <form id="obti-profile-form" class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Nome completo','obti'); ?></label>

@@ -54,8 +54,8 @@
         </button>
         <ul id="user-dropdown-desktop" class="hidden absolute right-0 mt-2 w-48 bg-white border rounded shadow-md">
           <li><a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Dashboard', 'obti'); ?></a></li>
-          <li><a href="<?php echo esc_url(home_url('/dashboard?tab=profile')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Profile', 'obti'); ?></a></li>
           <li><a href="<?php echo esc_url(home_url('/dashboard?tab=bookings')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Bookings', 'obti'); ?></a></li>
+          <li><a href="<?php echo esc_url(home_url('/dashboard?tab=profile')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Profile', 'obti'); ?></a></li>
           <li><a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Logout', 'obti'); ?></a></li>
         </ul>
       </div>
@@ -86,8 +86,8 @@
       </button>
       <ul id="user-dropdown-mobile" class="hidden mt-2 w-full bg-white border rounded shadow-md">
         <li><a href="<?php echo esc_url(home_url('/dashboard')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Dashboard', 'obti'); ?></a></li>
-        <li><a href="<?php echo esc_url(home_url('/dashboard?tab=profile')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Profile', 'obti'); ?></a></li>
         <li><a href="<?php echo esc_url(home_url('/dashboard?tab=bookings')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Bookings', 'obti'); ?></a></li>
+        <li><a href="<?php echo esc_url(home_url('/dashboard?tab=profile')); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Profile', 'obti'); ?></a></li>
         <li><a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="block px-4 py-2 hover:bg-gray-100"><?php _e('Logout', 'obti'); ?></a></li>
       </ul>
     </div>
