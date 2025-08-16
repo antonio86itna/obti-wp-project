@@ -12,6 +12,17 @@ wp-content/
   elementor/home.json
 ```
 
+## Installation
+
+1. Copy the `obti` theme along with the `obti-booking` and `obti-elementor-widgets` plugins into your site's `wp-content` directory, keeping the folder structure above.
+2. From `wp-content/themes/obti` install dependencies and build the CSS assets:
+
+   ```
+   cd wp-content/themes/obti
+   npm install
+   npm run build:css
+   ```
+
 ## Building the Theme
 The theme relies on Tailwind CSS. To compile the stylesheet run:
 
@@ -44,6 +55,20 @@ Re-import this template if you pull updates to ensure the latest Hero and Schedu
 5. If an older version of the Home template was previously imported, remove the old sections and insert the newly imported template to get the updated widgets.
 
 The template includes the following widgets in order: `obti-hero`, `obti-highlights`, `obti-schedule-map`, `obti-faq`, and `obti-booking`.
+
+## Stripe Test
+
+Enter your Stripe publishable and secret keys in **OBTI Booking → Settings** within the WordPress admin. When testing, enable test mode and use Stripe's test card numbers such as `4242 4242 4242 4242`.
+
+## User Roles & Dashboard
+
+The booking plugin registers an `obti_customer` role for customers created through the front-end form. After importing the [`wp-content/elementor/home.json`](wp-content/elementor/home.json) template, create a dashboard page using Elementor and assign the imported layout. Logged-in `obti_customer` users can visit this page to view their bookings.
+
+## Testing Workflow
+
+1. Simulate a booking on the front end and confirm that the selected date and time show available seats.
+2. Complete checkout using a Stripe test card and verify that the payment succeeds.
+3. After payment, log in as the created `obti_customer` and ensure the dashboard page is accessible.
 
 ## Booking REST API
 
