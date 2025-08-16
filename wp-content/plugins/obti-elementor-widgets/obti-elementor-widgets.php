@@ -33,12 +33,14 @@ add_action('elementor/widgets/register', function($widgets_manager){
     require_once OBTI_EW_DIR.'widgets/class-obti-faq.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-booking.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-chatbot.php';
+    require_once OBTI_EW_DIR.'widgets/class-obti-dashboard.php';
     $widgets_manager->register( new \OBTI_EW\Hero() );
     $widgets_manager->register( new \OBTI_EW\Highlights() );
     $widgets_manager->register( new \OBTI_EW\Schedule_Map() );
     $widgets_manager->register( new \OBTI_EW\FAQ() );
     $widgets_manager->register( new \OBTI_EW\Booking() );
     $widgets_manager->register( new \OBTI_EW\Chatbot() );
+    $widgets_manager->register( new \OBTI_EW\Dashboard() );
 });
 
 // Category
@@ -49,11 +51,12 @@ add_action('elementor/elements/categories_registered', function($elements_manage
     ]);
 });
 
-// Assets for booking widget
+// Assets for widgets
 add_action('wp_enqueue_scripts', function(){
     wp_register_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
     wp_register_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
     wp_register_script('obti-booking-widget', OBTI_EW_URL.'assets/js/booking-widget.js', ['flatpickr'], '1.0.0', true);
+    wp_register_script('obti-dashboard-widget', OBTI_EW_URL.'assets/js/dashboard-widget.js', [], '1.0.0', true);
     wp_enqueue_script('mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', [], '2.15.0', true);
     wp_enqueue_script('turf', 'https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js', [], '6.5.0', true);
 });
