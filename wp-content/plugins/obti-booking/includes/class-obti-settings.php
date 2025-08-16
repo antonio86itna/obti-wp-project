@@ -65,7 +65,10 @@ class OBTI_Admin_Settings_Page {
         if (is_string($raw_times)) {
             $raw_times = explode(',', $raw_times);
         }
-        $value['times'] = array_map('trim', (array) $raw_times);
+        $raw_times = array_map('trim', (array)$raw_times);
+        $value['times'] = array_values(array_filter($raw_times, function ($t) {
+            return preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $t);
+        }));
         return $value;
     }
     public static function render(){
@@ -86,7 +89,7 @@ class OBTI_Admin_Settings_Page {
               <tr><th><?php esc_html_e('Tour duration (min)','obti'); ?></th>
                 <td><input type="number" name="obti_settings[duration_min]" value="<?php echo esc_attr($o['duration_min']); ?>"></td></tr>
               <tr><th><?php esc_html_e('Times (HH:MM, comma separated)','obti'); ?></th>
-                <td><input type="text" name="obti_settings[times]" value="<?php echo esc_attr(is_array($o['times']) ? implode(',', $o['times']) : implode(',', (array) $o['times'])); ?>"></td></tr>
+                <td><input type="text" name="obti_settings[times]" value="<?php echo esc_attr(implode(',', (array)$o['times'])); ?>"></td></tr>
               <tr><th><?php esc_html_e('Cutoff (minutes before start)','obti'); ?></th>
                 <td><input type="number" name="obti_settings[cutoff_min]" value="<?php echo esc_attr($o['cutoff_min']); ?>"></td></tr>
               <tr><th><?php esc_html_e('Refund window (hours before start)','obti'); ?></th>
