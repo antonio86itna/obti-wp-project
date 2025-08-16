@@ -22,9 +22,7 @@ class OBTI_Settings {
             // Connect (optional - advanced)
             'connect_enabled' => 0,
             'connect_platform_secret_key' => '',
-            'connect_client_account_id' => '',
-            // Capacity overrides array: [ ['id'=>uniqid(),'from'=>'YYYY-MM-DD','to'=>'YYYY-MM-DD','times'=>['HH:MM'], 'capacity'=>int] ]
-            'capacity_overrides' => []
+            'connect_client_account_id' => ''
         ];
     }
     public static function get_all(){
@@ -47,12 +45,10 @@ class OBTI_Admin_Settings_Page {
     public static function init(){
         add_action('admin_menu', [__CLASS__, 'menu']);
         add_action('admin_init', [__CLASS__, 'register']);
-        add_action('admin_init', [__CLASS__, 'purge_overrides']);
     }
     public static function menu(){
         add_menu_page('OBTI Booking', 'OBTI Booking', 'manage_options', 'obti-booking', [__CLASS__, 'render'], 'dashicons-tickets', 26);
         add_submenu_page('obti-booking', __('Settings','obti'), __('Settings','obti'), 'manage_options', 'obti-booking', [__CLASS__, 'render']);
-        add_submenu_page('obti-booking', __('Capacity Overrides','obti'), __('Capacity Overrides','obti'), 'manage_options', 'obti-capacity', [__CLASS__, 'render_overrides']);
         add_submenu_page('obti-booking', __('Transfers Totaliweb','obti'), __('Transfers Totaliweb','obti'), 'manage_options', 'obti-transfers', ['OBTI_Transfers','render']);
     }
     public static function register(){
@@ -103,28 +99,6 @@ class OBTI_Admin_Settings_Page {
         return $value;
     }
 
-    public static function purge_overrides(){
-        $settings  = OBTI_Settings::get_all();
-        $times     = array_map('trim', (array)$settings['times']);
-        $overrides = OBTI_Settings::get('capacity_overrides', []);
-        $new       = [];
-        $changed   = false;
-        foreach((array)$overrides as $o){
-            $o_times = array_intersect((array)($o['times'] ?? []), $times);
-            if($o_times){
-                if($o_times !== ($o['times'] ?? [])){
-                    $o['times'] = array_values($o_times);
-                    $changed = true;
-                }
-                $new[] = $o;
-            } else {
-                $changed = true;
-            }
-        }
-        if($changed){
-            OBTI_Settings::update('capacity_overrides', $new);
-        }
-    }
     public static function render(){
         $o = OBTI_Settings::get_all();
         ?>
@@ -183,139 +157,5 @@ class OBTI_Admin_Settings_Page {
         <?php
     }
 
-    public static function render_overrides(){
-        $overrides = OBTI_Settings::get('capacity_overrides', []);
-        // Backwards compatibility: convert old key=>capacity map
-        if ($overrides && $overrides && (!is_array(reset($overrides)) || !isset(reset($overrides)['id']))) {
-            $converted = [];
-            foreach($overrides as $k=>$v){
-                $parts = explode(' ', $k);
-                $d = $parts[0] ?? '';
-                $t = $parts[1] ?? '';
-                if ($d && $t){
-                    $converted[] = ['id'=>uniqid(),'from'=>$d,'to'=>$d,'times'=>[$t],'capacity'=>intval($v)];
-                }
-            }
-            $overrides = $converted;
-            OBTI_Settings::update('capacity_overrides', $overrides);
-        }
-
-        // Reset all overrides
-        if (isset($_POST['obti_reset_overrides_nonce']) && wp_verify_nonce($_POST['obti_reset_overrides_nonce'], 'obti_reset_overrides')) {
-            $overrides = [];
-            OBTI_Settings::update('capacity_overrides', $overrides);
-            echo '<div class="updated"><p>'.esc_html__('Reset overrides.','obti').'</p></div>';
-        }
-
-        // Delete
-        if (isset($_GET['action'], $_GET['id']) && $_GET['action'] === 'delete') {
-            $del_id = sanitize_text_field($_GET['id']);
-            if (wp_verify_nonce($_GET['_wpnonce'] ?? '', 'obti_override_delete_'.$del_id)) {
-                $overrides = array_values(array_filter($overrides, function($o) use ($del_id){ return ($o['id'] ?? '') !== $del_id; }));
-                OBTI_Settings::update('capacity_overrides', $overrides);
-                echo '<div class="updated"><p>'.esc_html__('Deleted override.','obti').'</p></div>';
-            }
-        }
-
-        // Save / Update
-        if (isset($_POST['obti_override_nonce']) && wp_verify_nonce($_POST['obti_override_nonce'], 'obti_override_save')){
-            $id   = sanitize_text_field($_POST['id'] ?? '');
-            $from = sanitize_text_field($_POST['from'] ?? '');
-            $to   = sanitize_text_field($_POST['to'] ?? '');
-            $times_raw = (array)($_POST['times'] ?? []);
-            $times = array_filter(array_map('sanitize_text_field', $times_raw));
-            $cap  = max(0, intval($_POST['capacity'] ?? 0));
-            if ($from && !$to) $to = $from;
-            if ($from && $to){
-                if (!$id) $id = uniqid();
-                $record = [
-                    'id' => $id,
-                    'from' => $from,
-                    'to' => $to,
-                    'times' => $times,
-                    'capacity' => $cap
-                ];
-                $found = false;
-                foreach($overrides as $idx=>$o){
-                    if (($o['id'] ?? '') === $id){ $overrides[$idx] = $record; $found = true; break; }
-                }
-                if (!$found) $overrides[] = $record;
-                OBTI_Settings::update('capacity_overrides', $overrides);
-                echo '<div class="updated"><p>'.esc_html__('Saved override.','obti').'</p></div>';
-            }
-        }
-
-        $edit = null;
-        if (isset($_GET['action'], $_GET['id']) && $_GET['action'] === 'edit') {
-            $edit_id = sanitize_text_field($_GET['id']);
-            foreach ($overrides as $o) { if (($o['id'] ?? '') === $edit_id) { $edit = $o; break; } }
-        }
-
-        ?>
-        <div class="wrap">
-          <h1><?php esc_html_e('Capacity Overrides','obti'); ?></h1>
-          <form method="post">
-            <?php wp_nonce_field('obti_reset_overrides','obti_reset_overrides_nonce'); ?>
-            <p><button type="submit" class="button"><?php esc_html_e('Reset overrides','obti'); ?></button></p>
-          </form>
-          <h2><?php esc_html_e('Existing overrides','obti'); ?></h2>
-          <table class="widefat"><thead><tr><th><?php esc_html_e('From','obti'); ?></th><th><?php esc_html_e('To','obti'); ?></th><th><?php esc_html_e('Times','obti'); ?></th><th><?php esc_html_e('Capacity','obti'); ?></th><th><?php esc_html_e('Actions','obti'); ?></th></tr></thead><tbody>
-          <?php foreach($overrides as $o): ?>
-            <tr>
-              <td><?php echo esc_html($o['from']); ?></td>
-              <td><?php echo esc_html($o['to']); ?></td>
-              <td><?php echo esc_html(implode(', ', $o['times'] ?? [])); ?></td>
-              <td><?php echo esc_html($o['capacity']); ?></td>
-              <td>
-                <a href="<?php echo esc_url(add_query_arg(['page'=>'obti-capacity','action'=>'edit','id'=>$o['id']])); ?>"><?php esc_html_e('Edit','obti'); ?></a>
-                |
-                <a href="<?php echo esc_url(wp_nonce_url(add_query_arg(['page'=>'obti-capacity','action'=>'delete','id'=>$o['id']]), 'obti_override_delete_'.$o['id'])); ?>" onclick="return confirm('<?php echo esc_js(__('Delete override?','obti')); ?>');"><?php esc_html_e('Delete','obti'); ?></a>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-          </tbody></table>
-
-          <h2><?php echo $edit ? esc_html__('Edit override','obti') : esc_html__('Add override','obti'); ?></h2>
-          <form method="post">
-            <?php wp_nonce_field('obti_override_save','obti_override_nonce'); ?>
-            <?php if($edit): ?><input type="hidden" name="id" value="<?php echo esc_attr($edit['id']); ?>"><?php endif; ?>
-            <p>
-              <label><?php esc_html_e('From','obti'); ?> <input type="date" name="from" value="<?php echo esc_attr($edit['from'] ?? ''); ?>" required></label>
-              <label><?php esc_html_e('To','obti'); ?> <input type="date" name="to" value="<?php echo esc_attr($edit['to'] ?? ''); ?>"></label>
-              <label><?php esc_html_e('Capacity','obti'); ?> <input type="number" name="capacity" value="<?php echo esc_attr($edit['capacity'] ?? ''); ?>" required></label>
-            </p>
-            <div id="obti-times-wrapper">
-            <?php $times = $edit ? ($edit['times'] ?? []) : [''];
-            if (empty($times)) $times = [''];
-            foreach($times as $t): ?>
-              <p><input type="time" name="times[]" value="<?php echo esc_attr($t); ?>"> <button type="button" class="button obti-remove-time"><?php esc_html_e('Remove','obti'); ?></button></p>
-            <?php endforeach; ?>
-            </div>
-            <p><button type="button" class="button" id="obti-add-time"><?php esc_html_e('Add time','obti'); ?></button></p>
-            <p><button class="button button-primary"><?php echo $edit ? esc_html__('Update','obti') : esc_html__('Add override','obti'); ?></button></p>
-          </form>
-        </div>
-        <script>
-        (function(){
-            var addBtn = document.getElementById('obti-add-time');
-            if(addBtn){
-                addBtn.addEventListener('click', function(e){
-                    e.preventDefault();
-                    var wrap = document.getElementById('obti-times-wrapper');
-                    var p = document.createElement('p');
-                    p.innerHTML = '<input type="time" name="times[]"> <button type="button" class="button obti-remove-time"><?php echo esc_js(__('Remove','obti')); ?></button>';
-                    wrap.appendChild(p);
-                });
-                document.addEventListener('click', function(e){
-                    if(e.target && e.target.classList.contains('obti-remove-time')){
-                        e.preventDefault();
-                        e.target.parentNode.remove();
-                    }
-                });
-            }
-        })();
-        </script>
-        <?php
-    }
 }
 OBTI_Admin_Settings_Page::init();

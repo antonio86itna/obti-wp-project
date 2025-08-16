@@ -22,6 +22,20 @@ require_once OBTI_PLUGIN_DIR . 'includes/class-obti-cron.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-admin.php';
 require_once OBTI_PLUGIN_DIR . 'includes/class-obti-transfers.php';
 
+add_action('plugins_loaded', 'obti_maybe_upgrade');
+function obti_maybe_upgrade(){
+    $installed = get_option('obti_version');
+    if ($installed !== OBTI_VERSION){
+        delete_option('obti_capacity_overrides');
+        $settings = get_option('obti_settings', []);
+        if (isset($settings['capacity_overrides'])){
+            unset($settings['capacity_overrides']);
+            update_option('obti_settings', $settings);
+        }
+        update_option('obti_version', OBTI_VERSION);
+    }
+}
+
 function obti_get_page_id( $title ) {
     $q = new WP_Query([
         'post_type'      => 'page',
