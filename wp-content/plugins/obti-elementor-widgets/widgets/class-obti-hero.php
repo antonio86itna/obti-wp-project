@@ -23,38 +23,49 @@ class Hero extends Widget_Base {
         $rep = new Repeater();
         $rep->add_control('icon', ['label'=>__('Lucide Icon','obti'),'type'=>Controls_Manager::TEXT,'default'=>'ticket']);
         $rep->add_control('text', ['label'=>__('Text','obti'),'type'=>Controls_Manager::TEXT,'default'=>'A unique way to explore the island']);
-        $this->add_control('features', ['label'=>__('Features','obti'),'type'=>Controls_Manager::REPEATER,'fields'=>$rep->get_controls(),'default'=>[]]);
+        $this->add_control('features', [
+            'label'=>__('Features','obti'),
+            'type'=>Controls_Manager::REPEATER,
+            'fields'=>$rep->get_controls(),
+            'default'=>[
+                ['icon'=>'clock','text'=>__('Flexible schedule','obti')],
+                ['icon'=>'sun','text'=>__('Open-air views','obti')],
+                ['icon'=>'map-pin','text'=>__('Top island stops','obti')]
+            ]
+        ]);
         $this->end_controls_section();
     }
 
     protected function render(){
         $s = $this->get_settings_for_display();
         ?>
-        <section class="py-20 bg-white overflow-hidden">
-          <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h1 class="text-4xl md:text-6xl font-black mb-6"><?php echo esc_html($s['title']); ?></h1>
-                <p class="text-lg md:text-2xl mb-8"><?php echo esc_html($s['subtitle']); ?></p>
-                <a href="<?php echo esc_url($s['cta_link']); ?>" class="inline-block bg-theme-primary text-white font-bold py-4 px-10 rounded-full text-lg hover:bg-theme-primary-dark transition-all duration-300 shadow-xl">
-                  <?php echo esc_html($s['cta_text']); ?>
-                </a>
-                <?php if(!empty($s['features'])): ?>
-                <ul class="mt-10 space-y-4">
+        <section class="py-20 overflow-hidden">
+          <div class="container mx-auto px-6 lg:flex items-center">
+            <div class="lg:w-1/2">
+              <h1 class="text-4xl md:text-6xl font-black mb-6"><?php echo esc_html($s['title']); ?></h1>
+              <p class="text-lg md:text-2xl mb-8"><?php echo esc_html($s['subtitle']); ?></p>
+              <a href="<?php echo esc_url($s['cta_link']); ?>" class="inline-block bg-theme-primary text-white font-bold py-4 px-10 rounded-full text-lg hover:bg-theme-primary-dark transition-all duration-300 shadow-xl">
+                <?php echo esc_html($s['cta_text']); ?>
+              </a>
+              <?php if(!empty($s['features'])): ?>
+              <div class="mt-10">
+                <h2 class="text-sm font-bold tracking-widest uppercase mb-4"><?php esc_html_e('Key Features','obti'); ?></h2>
+                <div class="flex space-x-8">
                   <?php foreach($s['features'] as $f): ?>
-                    <li class="flex items-center">
-                      <i data-lucide="<?php echo esc_attr($f['icon']); ?>" class="w-6 h-6 theme-primary mr-3"></i>
+                    <div class="flex items-center space-x-2">
+                      <i data-lucide="<?php echo esc_attr($f['icon']); ?>" class="w-6 h-6 theme-primary"></i>
                       <span><?php echo esc_html($f['text']); ?></span>
-                    </li>
+                    </div>
                   <?php endforeach; ?>
-                </ul>
-                <?php endif; ?>
+                </div>
               </div>
-              <div class="relative">
-                <img src="<?php echo esc_url($s['bus_image']); ?>" alt="" class="relative z-10 w-full max-w-md mx-auto">
-                <div class="blob blob-1"></div>
-                <div class="blob blob-2"></div>
-              </div>
+              <?php endif; ?>
+            </div>
+            <div class="lg:w-1/2 relative mt-12 lg:mt-0">
+              <img src="<?php echo esc_url($s['bus_image']); ?>" alt="" class="relative z-10 w-full max-w-md mx-auto">
+              <div class="blob blob-1 animate-blob"></div>
+              <div class="blob blob-2 animate-blob animation-delay-2000"></div>
+              <div class="blob blob-3 animate-blob animation-delay-4000"></div>
             </div>
           </div>
           <script>
