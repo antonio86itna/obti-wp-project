@@ -17,6 +17,18 @@
     var availLabel = qs('#obti-availability-label');
     var payBtn = qs('#obti-pay-btn');
 
+    var userId = form.getAttribute('data-user');
+    if (userId) {
+      if (name) {
+        name.value = form.getAttribute('data-name') || name.value;
+        if (name.parentNode) name.parentNode.style.display = 'none';
+      }
+      if (email) {
+        email.value = form.getAttribute('data-email') || email.value;
+        if (email.parentNode) email.parentNode.style.display = 'none';
+      }
+    }
+
     flatpickr('#date-picker', { minDate: 'today', dateFormat: 'Y-m-d' });
 
     function updateAvailability(){
