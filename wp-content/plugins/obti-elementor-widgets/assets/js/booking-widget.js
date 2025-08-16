@@ -16,6 +16,7 @@
     var sumTotal = qs('#obti-sum-total');
     var availLabel = qs('#obti-availability-label');
     var payBtn = qs('#obti-pay-btn');
+    var lastDate;
 
     var userId = form.getAttribute('data-user');
     if (userId) {
@@ -36,8 +37,19 @@
       fetch(api + '/availability?date=' + encodeURIComponent(date.value))
       .then(r=>r.json())
       .then(d=>{
+        if (lastDate !== date.value){
+          qsa('option', time).forEach(o=>o.disabled=false);
+          lastDate = date.value;
+        }
+        (d.slots||[]).forEach(s=>{
+          var opt = time.querySelector('option[value="'+s.time+'"]');
+          if (opt && s.cutoff_passed){
+            opt.disabled = true;
+            if (opt.selected) time.value = '';
+          }
+        });
         var slot = (d.slots||[]).find(s => s.time === time.value);
-        if (!slot){ availLabel.textContent = ''; return; }
+        if (!slot){ availLabel.textContent = ''; payBtn.disabled = true; recalc(); return; }
         var avail = slot.available;
         qty.max = avail > 0 ? avail : 1;
         if (parseInt(qty.value||'1',10) > avail) qty.value = Math.max(1, avail);
