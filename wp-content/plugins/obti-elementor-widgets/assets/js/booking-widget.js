@@ -30,7 +30,7 @@
       }
     }
 
-    flatpickr('#date-picker', { minDate: 'today', dateFormat: 'Y-m-d' });
+    flatpickr('#date-picker', { allowInput: true, minDate: 'today', dateFormat: 'Y-m-d' });
 
     function updateAvailability(){
       if (!date.value) return;

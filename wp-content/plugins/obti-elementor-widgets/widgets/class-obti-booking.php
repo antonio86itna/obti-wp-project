@@ -45,7 +45,7 @@ class Booking extends Widget_Base {
                   <div class="space-y-6">
                     <div>
                       <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Date','obti'); ?></label>
-                      <input id="date-picker" name="date" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
+                      <input id="date-picker" name="date" placeholder="<?php esc_attr_e('Select date','obti'); ?>" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-theme-primary focus:border-theme-primary">
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Tour Time','obti'); ?></label>
