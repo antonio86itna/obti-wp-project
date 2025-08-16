@@ -1,5 +1,5 @@
 {
-  "version": "0.4",
+  "version": "0.5",
   "title": "Home",
   "type": "page",
   "content": [
@@ -19,7 +19,18 @@
               "id": "widget-hero",
               "elType": "widget",
               "widgetType": "obti-hero",
-              "settings": {}
+              "settings": {
+                "bus_image": "https://images.unsplash.com/photo-1623174542363-322b355d18a4?q=80&w=2070&auto=format&fit=crop",
+                "title": "Discover Ischia",
+                "subtitle": "From a unique perspective. The best open-top bus tour of the Green Island.",
+                "cta_text": "Book Your Seat",
+                "cta_link": "#booking",
+                "features": [
+                  {"icon": "clock", "text": "Flexible schedule"},
+                  {"icon": "sun", "text": "Open-air views"},
+                  {"icon": "map-pin", "text": "Top island stops"}
+                ]
+              }
             }
           ]
         }
@@ -63,7 +74,14 @@
               "id": "widget-schedule-map",
               "elType": "widget",
               "widgetType": "obti-schedule-map",
-              "settings": {}
+              "settings": {
+                "morning_title": "Morning Tour",
+                "morning_time": "09:00",
+                "morning_desc": "Start the day with the best light and fresh air. Ideal for photography lovers.",
+                "afternoon_title": "Afternoon Tour",
+                "afternoon_time": "15:00",
+                "afternoon_desc": "Enjoy the magical afternoon atmosphere and a spectacular sunset upon your return."
+              }
             }
           ]
         }
