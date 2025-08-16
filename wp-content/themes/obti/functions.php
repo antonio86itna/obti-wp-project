@@ -31,14 +31,19 @@ add_action('wp_enqueue_scripts', function(){
     ]);
 
     // Localize translations
-    wp_localize_script('obti-chatbot', 'obti_translations', [
-        'title'         => __('Chatbot', 'obti'),
-        'placeholder'   => __('Ask...', 'obti'),
-        'send'          => __('Send', 'obti'),
-        'no_answer'     => __('No response', 'obti'),
-        'network_error' => __('Network error', 'obti'),
-    ]);
-});
+      wp_localize_script('obti-chatbot', 'obti_translations', [
+          'title'         => __('Chatbot', 'obti'),
+          'placeholder'   => __('Ask...', 'obti'),
+          'send'          => __('Send', 'obti'),
+          'no_answer'     => __('No response', 'obti'),
+          'network_error' => __('Network error', 'obti'),
+      ]);
+
+      // Dropdown behaviour for user menu
+      wp_register_script('obti-header-dropdown', '', [], null, true);
+      wp_enqueue_script('obti-header-dropdown');
+      wp_add_inline_script('obti-header-dropdown', "document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-dropdown-toggle]').forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-dropdown-toggle');var menu=document.getElementById(id);if(menu){menu.classList.toggle('hidden');}});});});");
+  });
 
 // Add a small script to init lucide icons after DOM ready
 add_action('wp_footer', function(){
