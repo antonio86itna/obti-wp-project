@@ -62,6 +62,35 @@ class OBTI_Admin_Settings_Page {
     }
 
     public static function sanitize($value){
+        $defaults = OBTI_Settings::defaults();
+
+        // Trim whitespace from all string values first
+        foreach ($value as $k => $v) {
+            if (is_string($v)) {
+                $value[$k] = trim($v);
+            }
+        }
+
+        // Integer settings (no negatives)
+        foreach (['capacity','duration_min','cutoff_min','refund_window_hours'] as $k) {
+            $value[$k] = isset($value[$k]) ? max(0, intval($value[$k])) : $defaults[$k];
+        }
+        // Boolean checkbox
+        $value['connect_enabled'] = empty($value['connect_enabled']) ? 0 : 1;
+        // Float settings (no negatives)
+        foreach (['price','service_fee_percent','agency_fee_percent'] as $k) {
+            $value[$k] = isset($value[$k]) ? max(0, floatval($value[$k])) : $defaults[$k];
+        }
+        // String settings
+        foreach ([
+            'currency','address_label','api_key','stripe_mode','stripe_secret_key',
+            'stripe_publishable_key','stripe_webhook_secret','connect_platform_secret_key',
+            'connect_client_account_id'
+        ] as $k) {
+            $value[$k] = isset($value[$k]) ? sanitize_text_field($value[$k]) : $defaults[$k];
+        }
+
+        // Times array: comma separated HH:MM values
         $raw_times = $_POST['obti_settings']['times'] ?? [];
         if (is_string($raw_times)) {
             $raw_times = explode(',', $raw_times);
@@ -70,6 +99,7 @@ class OBTI_Admin_Settings_Page {
         $value['times'] = array_values(array_filter($raw_times, function ($t) {
             return preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $t);
         }));
+
         return $value;
     }
 
