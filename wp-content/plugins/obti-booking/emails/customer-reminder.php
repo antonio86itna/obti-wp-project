@@ -9,7 +9,7 @@ $dashboard_url = $account_page_id ? get_permalink( $account_page_id ) : home_url
 ?>
 <?php include __DIR__ . '/partials/header.php'; ?>
 <h2 style="margin:0 0 8px 0;">
-  <?php echo esc_html__( 'Booking Reminder', 'obti' ); ?>
+  <?php echo esc_html__( 'Booking reminder', 'obti' ); ?>
 </h2>
 <p style="margin:0 0 16px 0;">
   <?php echo sprintf( esc_html__( 'Hi %1$s, here is a reminder for your booking on %2$s at %3$s.', 'obti' ), esc_html( $name ), esc_html( $date ), esc_html( $time ) ); ?>
