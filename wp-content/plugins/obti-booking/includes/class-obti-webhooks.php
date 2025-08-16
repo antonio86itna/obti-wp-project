@@ -103,6 +103,13 @@ class OBTI_Webhooks {
         return ['received'=>true];
     }
 
+    public static function email_customer_pending($booking_id, $checkout_url){
+        $to = get_post_meta($booking_id,'_obti_email', true);
+        if (!$to) return;
+        $subject = sprintf(__('Complete your booking — #%d','obti'), $booking_id);
+        $html = self::render_email_template('customer-pending.php', $booking_id, ['checkout_url'=>$checkout_url]);
+        self::send_html_mail($to, $subject, $html);
+    }
     private static function email_customer_confirmed($booking_id){
         $to = get_post_meta($booking_id,'_obti_email', true);
         if (!$to) return;
@@ -117,9 +124,10 @@ class OBTI_Webhooks {
         self::send_html_mail($admin, $subject, $html);
     }
 
-    public static function render_email_template($template, $booking_id){
+    public static function render_email_template($template, $booking_id, $vars = []){
         $path = OBTI_PLUGIN_DIR . 'emails/' . $template;
         if (!file_exists($path)) return '';
+        extract($vars);
         ob_start();
         include $path;
         return ob_get_clean();
