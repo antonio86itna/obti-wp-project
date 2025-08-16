@@ -134,6 +134,7 @@ class OBTI_REST {
 
         // Availability check
         $av = self::availability(new WP_REST_Request('GET', '/obti/v1/availability?date='.$date));
+        $av = $av instanceof WP_REST_Response ? $av->get_data() : $av;
         if (is_wp_error($av)) return new WP_REST_Response(['error'=>'availability_error'], 400);
         $found = null;
         foreach($av['slots'] as $slot){ if ($slot['time'] === $time) { $found = $slot; break; } }
