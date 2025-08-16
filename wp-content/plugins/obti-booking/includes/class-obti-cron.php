@@ -9,17 +9,16 @@ class OBTI_Cron {
     // Remove expired holds
     public static function cleanup(){
         $q = new WP_Query([
-            'post_type'=>'obti_booking',
-            'post_status'=>['obti-pending'],
-            'posts_per_page'=>-1,
-            'fields'=>'ids',
-            'meta_query'=>[
-                ['key'=>'_obti_hold_expires','value'=>time(),'compare'=>'<','type'=>'NUMERIC']
-            ]
+            'post_type'   => 'obti_booking',
+            'post_status' => ['obti-pending'],
+            'posts_per_page' => -1,
+            'fields'      => 'ids'
         ]);
         foreach($q->posts as $id){
-            wp_update_post(['ID'=>$id, 'post_status'=>'obti-cancelled']);
-            update_post_meta($id,'_obti_cancel_reason','hold_expired');
+            if (false === get_transient('obti_hold_'.$id)){
+                wp_update_post(['ID'=>$id, 'post_status'=>'obti-cancelled']);
+                update_post_meta($id,'_obti_cancel_reason','hold_expired');
+            }
         }
     }
     // Move confirmed bookings to in_progress/completed based on time

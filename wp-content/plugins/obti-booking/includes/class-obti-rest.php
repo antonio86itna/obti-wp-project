@@ -175,8 +175,8 @@ class OBTI_REST {
             'post_title'=>$title,
             'post_status'=>'obti-pending'
         ]);
-        $hold_minutes = 20;
-        $hold_expires = time() + ($hold_minutes * 60);
+        $hold_minutes = 30;
+        $hold_expires = time() + ($hold_minutes * MINUTE_IN_SECONDS);
         update_post_meta($post_id, '_obti_date', $date);
         update_post_meta($post_id, '_obti_time', $time);
         update_post_meta($post_id, '_obti_qty', $qty);
@@ -193,6 +193,7 @@ class OBTI_REST {
         $token = wp_generate_password(32,false,false);
         update_post_meta($post_id, '_obti_manage_token', $token);
         update_post_meta($post_id, '_obti_fee_transferred', 'no');
+        set_transient('obti_hold_'.$post_id, ['expires'=>$hold_expires], 30 * MINUTE_IN_SECONDS);
 
         // Create Stripe Checkout Session
         $checkout = OBTI_Checkout::create_checkout_session($post_id);
@@ -201,6 +202,7 @@ class OBTI_REST {
             wp_update_post(['ID'=>$post_id, 'post_status'=>'obti-cancelled']);
             return new WP_REST_Response(['error'=>$checkout->get_error_message()], 400);
         }
+        OBTI_Webhooks::email_customer_pending($post_id, $checkout['url']);
         return ['checkout_url'=>$checkout['url'], 'booking_id'=>$post_id];
     }
 
