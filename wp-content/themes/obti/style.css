@@ -7,3 +7,8 @@ Description: Minimal base theme for Elementor + OBTI Booking. Tailwind via CDN f
 Version: 1.0.0
 Text Domain: obti
 */
+
+.header-scrolled {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
