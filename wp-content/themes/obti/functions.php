@@ -40,9 +40,7 @@ add_action('wp_enqueue_scripts', function(){
       ]);
 
       // Dropdown behaviour for user menu
-      wp_register_script('obti-header-dropdown', '', [], null, true);
-      wp_enqueue_script('obti-header-dropdown');
-      wp_add_inline_script('obti-header-dropdown', "document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-dropdown-toggle]').forEach(function(btn){btn.addEventListener('click',function(){var id=btn.getAttribute('data-dropdown-toggle');var menu=document.getElementById(id);if(menu){menu.classList.toggle('hidden');}});});});");
+      wp_enqueue_script('obti-header-auth', get_template_directory_uri() . '/assets/js/header-auth.js', [], '1.0.0', true);
   });
 
 // Add a small script to init lucide icons after DOM ready
