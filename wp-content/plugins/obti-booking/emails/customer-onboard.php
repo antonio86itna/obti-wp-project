@@ -4,10 +4,8 @@ $name         = get_post_meta( $booking_id, '_obti_name', true );
 $date         = get_post_meta( $booking_id, '_obti_date', true );
 $time         = get_post_meta( $booking_id, '_obti_time', true );
 $checkout_url = $checkout_url ?? '#';
-$email        = get_post_meta( $booking_id, '_obti_email', true );
-$token        = get_post_meta( $booking_id, '_obti_manage_token', true );
-$account_page_id = obti_get_page_id( 'My Bookings' );
-$dashboard_url = $account_page_id ? add_query_arg( ['token' => $token, 'email' => $email], get_permalink( $account_page_id ) ) : home_url( '/' );
+$account_page_id = obti_get_page_id( 'My Account' );
+$dashboard_url = $account_page_id ? get_permalink( $account_page_id ) : home_url( '/' );
 $ebook_url    = $ebook_url ?? '#';
 ?>
 <?php include __DIR__ . '/partials/header.php'; ?>

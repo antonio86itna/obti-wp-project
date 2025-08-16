@@ -63,7 +63,8 @@ function obti_maybe_create_pages(){
     $pages = [
         'Booking Success' => '[obti_booking_success]',
         'Booking Cancelled' => '[obti_booking_cancel]',
-        'My Bookings' => '[obti_account]'
+        'My Bookings' => '[obti_account]',
+        'My Account' => '[obti_dashboard]'
     ];
     foreach($pages as $title=>$shortcode){
         $exists = obti_get_page_id($title);
@@ -172,6 +173,29 @@ add_shortcode('obti_account', function(){
     </script>
     <?php
     return ob_get_clean();
+});
+
+// Redirect obti_customer role away from wp-admin and hide admin bar
+add_action('admin_init', function(){
+    if ( wp_doing_ajax() ) {
+        return;
+    }
+    $user = wp_get_current_user();
+    if ( in_array( 'obti_customer', (array) $user->roles, true ) ) {
+        $page_id = obti_get_page_id( 'My Account' );
+        if ( $page_id ) {
+            wp_safe_redirect( get_permalink( $page_id ) );
+            exit;
+        }
+    }
+});
+
+add_filter('show_admin_bar', function( $show ){
+    $user = wp_get_current_user();
+    if ( in_array( 'obti_customer', (array) $user->roles, true ) ) {
+        return false;
+    }
+    return $show;
 });
 
 // Helper: can cancel?

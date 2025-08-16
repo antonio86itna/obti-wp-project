@@ -60,3 +60,14 @@ add_action('wp_enqueue_scripts', function(){
     wp_enqueue_script('mapbox-gl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', [], '2.15.0', true);
     wp_enqueue_script('turf', 'https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js', [], '6.5.0', true);
 });
+
+// Shortcode for dashboard widget
+add_shortcode('obti_dashboard', function(){
+    if ( ! class_exists('\\OBTI_EW\\Dashboard') ) {
+        require_once OBTI_EW_DIR.'widgets/class-obti-dashboard.php';
+    }
+    ob_start();
+    $widget = new \OBTI_EW\Dashboard();
+    $widget->render();
+    return ob_get_clean();
+});
