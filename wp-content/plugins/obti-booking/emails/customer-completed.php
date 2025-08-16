@@ -9,7 +9,7 @@ $reviews_url  = $reviews_url ?? '#';
 ?>
 <?php include __DIR__ . '/partials/header.php'; ?>
 <h2 style="margin:0 0 8px 0;">
-  <?php echo esc_html__( 'Thank you for travelling with us', 'obti' ); ?>
+  <?php echo esc_html__( 'Thank you for traveling with us', 'obti' ); ?>
 </h2>
 <p style="margin:0 0 16px 0;">
   <?php echo sprintf( esc_html__( '%1$s, we hope you enjoyed your tour on %2$s at %3$s.', 'obti' ), esc_html( $name ), esc_html( $date ), esc_html( $time ) ); ?>
