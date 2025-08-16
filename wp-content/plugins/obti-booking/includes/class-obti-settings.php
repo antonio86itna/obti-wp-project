@@ -47,6 +47,7 @@ class OBTI_Admin_Settings_Page {
     public static function init(){
         add_action('admin_menu', [__CLASS__, 'menu']);
         add_action('admin_init', [__CLASS__, 'register']);
+        add_action('admin_init', [__CLASS__, 'purge_overrides']);
     }
     public static function menu(){
         add_menu_page('OBTI Booking', 'OBTI Booking', 'manage_options', 'obti-booking', [__CLASS__, 'render'], 'dashicons-tickets', 26);
@@ -70,6 +71,29 @@ class OBTI_Admin_Settings_Page {
             return preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $t);
         }));
         return $value;
+    }
+
+    public static function purge_overrides(){
+        $settings  = OBTI_Settings::get_all();
+        $times     = array_map('trim', (array)$settings['times']);
+        $overrides = OBTI_Settings::get('capacity_overrides', []);
+        $new       = [];
+        $changed   = false;
+        foreach((array)$overrides as $o){
+            $o_times = array_intersect((array)($o['times'] ?? []), $times);
+            if($o_times){
+                if($o_times !== ($o['times'] ?? [])){
+                    $o['times'] = array_values($o_times);
+                    $changed = true;
+                }
+                $new[] = $o;
+            } else {
+                $changed = true;
+            }
+        }
+        if($changed){
+            OBTI_Settings::update('capacity_overrides', $new);
+        }
     }
     public static function render(){
         $o = OBTI_Settings::get_all();
@@ -146,6 +170,13 @@ class OBTI_Admin_Settings_Page {
             OBTI_Settings::update('capacity_overrides', $overrides);
         }
 
+        // Reset all overrides
+        if (isset($_POST['obti_reset_overrides_nonce']) && wp_verify_nonce($_POST['obti_reset_overrides_nonce'], 'obti_reset_overrides')) {
+            $overrides = [];
+            OBTI_Settings::update('capacity_overrides', $overrides);
+            echo '<div class="updated"><p>'.esc_html__('Reset overrides.','obti').'</p></div>';
+        }
+
         // Delete
         if (isset($_GET['action'], $_GET['id']) && $_GET['action'] === 'delete') {
             $del_id = sanitize_text_field($_GET['id']);
@@ -193,6 +224,10 @@ class OBTI_Admin_Settings_Page {
         ?>
         <div class="wrap">
           <h1><?php esc_html_e('Capacity Overrides','obti'); ?></h1>
+          <form method="post">
+            <?php wp_nonce_field('obti_reset_overrides','obti_reset_overrides_nonce'); ?>
+            <p><button type="submit" class="button"><?php esc_html_e('Reset overrides','obti'); ?></button></p>
+          </form>
           <h2><?php esc_html_e('Existing overrides','obti'); ?></h2>
           <table class="widefat"><thead><tr><th><?php esc_html_e('From','obti'); ?></th><th><?php esc_html_e('To','obti'); ?></th><th><?php esc_html_e('Times','obti'); ?></th><th><?php esc_html_e('Capacity','obti'); ?></th><th><?php esc_html_e('Actions','obti'); ?></th></tr></thead><tbody>
           <?php foreach($overrides as $o): ?>
