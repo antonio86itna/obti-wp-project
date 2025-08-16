@@ -178,14 +178,23 @@ class OBTI_REST {
         }
 
         // Availability check
-        $av = self::availability(new WP_REST_Request('GET', '/obti/v1/availability?date='.$date));
+        $req = new WP_REST_Request('GET', '/obti/v1/availability');
+        $req->set_param('date', $date);
+        $av = self::availability($req);
         $av = $av instanceof WP_REST_Response ? $av->get_data() : $av;
-        if (is_wp_error($av)) return new WP_REST_Response(['error'=>'availability_error'], 400);
+        if (empty($av['slots']) || !is_array($av['slots'])) {
+            return new WP_REST_Response(['error'=>'availability_error'], 400);
+        }
         $found = null;
-        foreach($av['slots'] as $slot){ if ($slot['time'] === $time) { $found = $slot; break; } }
+        foreach($av['slots'] as $slot){
+            if (isset($slot['time']) && $slot['time'] === $time) {
+                $found = $slot;
+                break;
+            }
+        }
         if (!$found) return new WP_REST_Response(['error'=>'slot_not_found'], 404);
-        if ($found['cutoff_passed']) return new WP_REST_Response(['error'=>'cutoff_passed'], 400);
-        if ($qty > $found['available']) return new WP_REST_Response(['error'=>'not_enough_seats','available'=>$found['available']], 400);
+        if (!empty($found['cutoff_passed']) && $found['cutoff_passed']) return new WP_REST_Response(['error'=>'cutoff_passed'], 400);
+        if ($qty > ($found['available'] ?? 0)) return new WP_REST_Response(['error'=>'not_enough_seats','available'=>$found['available']], 400);
 
         // Create pending booking (HOLD)
         $price = floatval(OBTI_Settings::get('price', 20));
