@@ -239,7 +239,6 @@ class OBTI_REST {
         $email = sanitize_email($params['email'] ?? '');
         if (!$booking_id || !$token || !$email) return new WP_REST_Response(['error'=>'bad_request'], 400);
         if (get_post_meta($booking_id, '_obti_manage_token', true) !== $token) return new WP_REST_Response(['error'=>'unauthorized'], 403);
-        update_post_meta($post_id, '_obti_fee_transferred', 'no');
         if (get_post_meta($booking_id, '_obti_email', true) !== $email) return new WP_REST_Response(['error'=>'unauthorized'], 403);
         if (!obti_can_cancel($booking_id)) return new WP_REST_Response(['error'=>'cannot_cancel_yet','message'=>__('You can cancel up to 72h before start.','obti')], 400);
 
