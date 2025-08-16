@@ -10,7 +10,8 @@
     var date = qs("#date-picker", form);
     var time = qs('select[name="time"]', form);
     var qty  = qs('input[name="qty"]', form);
-    var name = qs('input[name="name"]', form);
+    var fname = qs('input[name="first_name"]', form);
+    var lname = qs('input[name="last_name"]', form);
     var email= qs('input[name="email"]', form);
     var sumQty = qs('#obti-sum-qty');
     var sumTotal = qs('#obti-sum-total');
@@ -20,9 +21,13 @@
 
     var userId = form.getAttribute('data-user');
     if (userId) {
-      if (name) {
-        name.value = form.getAttribute('data-name') || name.value;
-        if (name.parentNode) name.parentNode.style.display = 'none';
+      if (fname) {
+        fname.value = form.getAttribute('data-first-name') || fname.value;
+        if (fname.parentNode) fname.parentNode.style.display = 'none';
+      }
+      if (lname) {
+        lname.value = form.getAttribute('data-last-name') || lname.value;
+        if (lname.parentNode) lname.parentNode.style.display = 'none';
       }
       if (email) {
         email.value = form.getAttribute('data-email') || email.value;
@@ -87,10 +92,11 @@
         date: date.value,
         time: time.value,
         qty: parseInt(qty.value||'1',10),
-        name: name.value.trim(),
+        first_name: fname.value.trim(),
+        last_name: lname.value.trim(),
         email: email.value.trim()
       };
-      if (!payload.date || !payload.time || !payload.qty || !payload.name || !payload.email){ alert('Please fill all fields'); return; }
+      if (!payload.date || !payload.time || !payload.qty || !payload.first_name || !payload.last_name || !payload.email){ alert('Please fill all fields'); return; }
       payBtn.disabled = true;
       fetch(api + '/checkout', {
         method: 'POST',

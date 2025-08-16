@@ -155,14 +155,16 @@ class OBTI_REST {
         $date = sanitize_text_field($params['date'] ?? '');
         $time = sanitize_text_field($params['time'] ?? '');
         $qty  = max(1, intval($params['qty'] ?? 1));
-        $name = sanitize_text_field($params['name'] ?? '');
+        $first_name = sanitize_text_field($params['first_name'] ?? '');
+        $last_name  = sanitize_text_field($params['last_name'] ?? '');
+        $name = trim($first_name . ' ' . $last_name);
         $email = sanitize_email($params['email'] ?? '');
 
-        if (!$date || !$time || !$qty || !$name || !$email){
+        if (!$date || !$time || !$qty || !$first_name || !$last_name || !$email){
             return new WP_REST_Response(['error'=>'missing_fields'], 400);
         }
 
-        $user_id = OBTI_Checkout::ensure_customer($email, $name);
+        $user_id = OBTI_Checkout::ensure_customer($email, $first_name, $last_name);
         if (is_wp_error($user_id)) {
             return new WP_REST_Response(['error'=>'user_create_failed'], 500);
         }
@@ -215,6 +217,8 @@ class OBTI_REST {
         update_post_meta($post_id, '_obti_total', number_format($subtotal + $service_fee_total,2,'.',''));
         update_post_meta($post_id, '_obti_email', $email);
         update_post_meta($post_id, '_obti_name', $name);
+        update_post_meta($post_id, '_obti_first_name', $first_name);
+        update_post_meta($post_id, '_obti_last_name', $last_name);
         update_post_meta($post_id, '_obti_currency', $currency);
         update_post_meta($post_id, '_obti_user_id', $user_id);
         update_post_meta($post_id, '_obti_hold_expires', $hold_expires);
