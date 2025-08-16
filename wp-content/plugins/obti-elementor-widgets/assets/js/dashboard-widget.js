@@ -47,14 +47,48 @@
           (list||[]).forEach(function(b){
             var div = document.createElement('div');
             div.className = 'p-4 border rounded flex justify-between items-center';
-            div.innerHTML = '<div><div class="font-bold">'+b.date+' '+b.time+'</div><div class="text-sm text-gray-600">'+b.qty+' tickets</div></div><button class="text-theme-primary underline" data-id="'+b.id+'">View</button>';
+            var actions = '';
+            if(b.status === 'obti-pending'){
+              actions = '<button class="obti-pay text-green-600 underline" data-id="'+b.id+'">Pay now</button>'+
+                        '<button class="obti-cancel text-red-600 underline ml-2" data-id="'+b.id+'">Cancel</button>';
+            } else {
+              actions = '<span>'+b.status.replace('obti-','')+'</span>';
+            }
+            div.innerHTML = '<div><div class="font-bold">'+b.date+' '+b.time+'</div><div class="text-sm text-gray-600">'+b.qty+' tickets</div></div>'+
+              '<div class="space-x-2">'+actions+'</div>';
             cont.appendChild(div);
           });
-          qsa('button[data-id]', cont).forEach(function(btn){
+          qsa('.obti-cancel', cont).forEach(function(btn){
             btn.addEventListener('click', function(){
               var id = this.getAttribute('data-id');
               var b = (list||[]).find(function(x){ return String(x.id)===String(id); });
-              if(b) openModal(b);
+              if(!b) return;
+              if(!confirm('Cancel booking?')) return;
+              fetch(api + '/cancel', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({booking_id: b.id, token: b.token, email: email})
+              }).then(function(r){return r.json();})
+              .then(function(res){
+                alert(res.message || res.error || 'done');
+                loadBookings();
+              }).catch(function(){});
+            });
+          });
+          qsa('.obti-pay', cont).forEach(function(btn){
+            btn.addEventListener('click', function(){
+              var id = this.getAttribute('data-id');
+              var b = (list||[]).find(function(x){ return String(x.id)===String(id); });
+              if(!b) return;
+              fetch(api + '/pay', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({booking_id: b.id, token: b.token, email: email, payment_method: 'pm_card_visa'})
+              }).then(function(r){return r.json();})
+              .then(function(res){
+                alert(res.message || res.error || 'done');
+                loadBookings();
+              }).catch(function(){});
             });
           });
           var now = new Date();
@@ -65,28 +99,6 @@
             qs('#obti-upcoming', wrap).textContent = 'Next tour: '+upcoming.date+' '+upcoming.time;
           }
         }).catch(function(){});
-    }
-
-    function openModal(b){
-      var modal = qs('#obti-booking-modal');
-      qs('#obti-booking-details').innerHTML = '<p class="font-bold">'+b.date+' '+b.time+'</p><p>'+b.qty+' tickets</p><p>Total €'+b.total+'</p>';
-      qs('#obti-booking-qr').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+encodeURIComponent(b.manage_url || (api+"/bookings/"+b.id))+'" alt="QR">';
-      qs('[data-close]', modal).onclick = function(){ modal.classList.add('hidden'); };
-      var cancelBtn = qs('#obti-cancel-btn');
-      cancelBtn.onclick = function(){
-        if(!confirm('Cancel booking?')) return;
-        fetch(api + '/cancel', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({booking_id: b.id, token: b.token, email: emailInput.value})
-        }).then(function(r){return r.json();})
-        .then(function(res){
-          alert(res.message || res.error || 'done');
-          modal.classList.add('hidden');
-          loadBookings();
-        }).catch(function(){});
-      };
-      modal.classList.remove('hidden');
     }
 
     show('dashboard');

@@ -2,6 +2,44 @@
 if (!defined('ABSPATH')) { exit; }
 
 class OBTI_Checkout {
+
+    /**
+     * Ensure a user exists for the given email. If the email is not associated
+     * with an account, a new user is created with the `obti_customer` role and
+     * a random password. A welcome email with the credentials is sent to the
+     * customer. Returns the user ID or a WP_Error on failure.
+     */
+    public static function ensure_customer($email, $name = ''){
+        $email = sanitize_email($email);
+        $user  = get_user_by('email', $email);
+        if ($user && ! is_wp_error($user)) {
+            return $user->ID;
+        }
+
+        $password = wp_generate_password();
+        $user_id  = wp_create_user($email, $password, $email);
+        if (is_wp_error($user_id)) {
+            return $user_id;
+        }
+
+        wp_update_user([
+            'ID'           => $user_id,
+            'display_name' => $name,
+            'role'         => 'obti_customer',
+        ]);
+
+        $subject = __('Welcome to Open Bus Tour Ischia', 'obti');
+        $message = sprintf(
+            __("Hi %s,\n\nYour account has been created.\nLogin: %s\nPassword: %s\n\nThank you!", 'obti'),
+            $name,
+            $email,
+            $password
+        );
+        wp_mail($email, $subject, $message);
+
+        return $user_id;
+    }
+
     public static function create_checkout_session($booking_id){
         $email = get_post_meta($booking_id,'_obti_email', true);
         $name  = get_post_meta($booking_id,'_obti_name', true);

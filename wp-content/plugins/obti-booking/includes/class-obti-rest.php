@@ -21,10 +21,15 @@ class OBTI_REST {
             'callback' => [__CLASS__, 'cancel'],
             'permission_callback' => '__return_true'
         ]);
+        register_rest_route('obti/v1', '/pay', [
+            'methods' => 'POST',
+            'callback' => [__CLASS__, 'pay'],
+            'permission_callback' => '__return_true'
+        ]);
         register_rest_route('obti/v1', '/bookings', [
             'methods' => 'GET',
             'callback' => [__CLASS__, 'bookings'],
-            'permission_callback' => [__CLASS__, 'auth']
+            'permission_callback' => '__return_true'
         ]);
         register_rest_route('obti/v1', '/bookings/(?P<id>\d+)/transfer', [
             'methods' => 'PATCH',
@@ -129,20 +134,9 @@ class OBTI_REST {
             return new WP_REST_Response(['error'=>'missing_fields'], 400);
         }
 
-        $user = get_user_by('email', $email);
-        if ($user && !is_wp_error($user)) {
-            $user_id = $user->ID;
-        } else {
-            $user_id = wp_insert_user([
-                'user_login'   => $email,
-                'user_pass'    => wp_generate_password(),
-                'user_email'   => $email,
-                'display_name' => $name,
-                'role'         => 'obti_customer'
-            ]);
-            if (is_wp_error($user_id)) {
-                return new WP_REST_Response(['error'=>'user_create_failed'], 500);
-            }
+        $user_id = OBTI_Checkout::ensure_customer($email, $name);
+        if (is_wp_error($user_id)) {
+            return new WP_REST_Response(['error'=>'user_create_failed'], 500);
         }
 
         // Availability check
@@ -213,19 +207,24 @@ class OBTI_REST {
     public static function bookings($req){
         $date = sanitize_text_field($req->get_param('date'));
         $status = sanitize_text_field($req->get_param('status'));
+        $email = sanitize_email($req->get_param('email'));
         $args = [
             'post_type' => 'obti_booking',
             'posts_per_page' => -1,
+            'post_status' => ['obti-confirmed', 'obti-in-progress', 'obti-pending', 'obti-cancelled'],
         ];
         if ($status) {
             $args['post_status'] = $status;
-        } else {
-            $args['post_status'] = ['obti-confirmed', 'obti-in-progress', 'obti-pending', 'obti-cancelled'];
         }
+        $meta = [];
         if ($date) {
-            $args['meta_query'] = [
-                ['key' => '_obti_date', 'value' => $date, 'compare' => '=']
-            ];
+            $meta[] = ['key' => '_obti_date', 'value' => $date, 'compare' => '='];
+        }
+        if ($email) {
+            $meta[] = ['key' => '_obti_email', 'value' => $email, 'compare' => '='];
+        }
+        if ($meta) {
+            $args['meta_query'] = $meta;
         }
         $posts = get_posts($args);
         $items = [];
@@ -238,9 +237,8 @@ class OBTI_REST {
                 'time' => get_post_meta($id, '_obti_time', true),
                 'qty' => intval(get_post_meta($id, '_obti_qty', true)),
                 'total' => floatval(get_post_meta($id, '_obti_total', true)),
-                'service_fee' => floatval(get_post_meta($id, '_obti_service_fee', true)),
-                'agency_fee' => floatval(get_post_meta($id, '_obti_agency_fee', true)),
-                'transfer_status' => get_post_meta($id, '_obti_fee_transferred', true),
+                'status' => get_post_status($id),
+                'token' => get_post_meta($id, '_obti_manage_token', true),
             ];
         }
         return $items;
@@ -256,6 +254,66 @@ class OBTI_REST {
         return ['id' => $id, 'transfer_status' => $status];
     }
 
+    public static function pay($req){
+        $params = json_decode($req->get_body(), true);
+        if (!is_array($params)) $params = $req->get_params();
+        $booking_id = intval($params['booking_id'] ?? 0);
+        $token = sanitize_text_field($params['token'] ?? '');
+        $email = sanitize_email($params['email'] ?? '');
+        $pm = sanitize_text_field($params['payment_method'] ?? '');
+        if (!$booking_id || !$token || !$email || !$pm){
+            return new WP_REST_Response(['error'=>'bad_request'], 400);
+        }
+        if (get_post_meta($booking_id, '_obti_manage_token', true) !== $token){
+            return new WP_REST_Response(['error'=>'unauthorized'], 403);
+        }
+        if (get_post_meta($booking_id, '_obti_email', true) !== $email){
+            return new WP_REST_Response(['error'=>'unauthorized'], 403);
+        }
+        $total = floatval(get_post_meta($booking_id,'_obti_total', true));
+        $currency = strtolower(get_post_meta($booking_id,'_obti_currency', true) ?: 'eur');
+
+        $secret = OBTI_Settings::get('stripe_secret_key','');
+        $connect_enabled = !empty(OBTI_Settings::get('connect_enabled', 0));
+        $platform_secret = OBTI_Settings::get('connect_platform_secret_key','');
+        $use_key = $secret;
+        if ($connect_enabled && $platform_secret) $use_key = $platform_secret;
+
+        $body = [
+            'amount' => intval(round($total * 100)),
+            'currency' => $currency,
+            'payment_method' => $pm,
+            'confirmation_method' => 'manual',
+            'confirm' => 'true',
+            'metadata[booking_id]' => $booking_id,
+        ];
+        if ($connect_enabled && $platform_secret && ($dest = OBTI_Settings::get('connect_client_account_id',''))){
+            $body['transfer_data[destination]'] = $dest;
+            $agency_fee = floatval(get_post_meta($booking_id,'_obti_agency_fee', true));
+            $body['application_fee_amount'] = intval(round($agency_fee * 100));
+        }
+
+        $res = wp_remote_post('https://api.stripe.com/v1/payment_intents', [
+            'headers' => [
+                'Authorization' => 'Bearer '.$use_key,
+                'Content-Type'  => 'application/x-www-form-urlencoded'
+            ],
+            'body' => http_build_query($body),
+            'timeout' => 45
+        ]);
+        if (is_wp_error($res)) return new WP_REST_Response(['error'=>'stripe_error'], 400);
+        $code = wp_remote_retrieve_response_code($res);
+        $body_res = json_decode(wp_remote_retrieve_body($res), true);
+        if ($code >= 200 && $code < 300 && isset($body_res['id']) && ($body_res['status'] ?? '') === 'succeeded'){
+            update_post_meta($booking_id, '_obti_payment_intent', sanitize_text_field($body_res['id']));
+            wp_update_post(['ID'=>$booking_id, 'post_status'=>'obti-confirmed']);
+            do_action('obti_booking_confirmed', $booking_id, $body_res);
+            return ['ok'=>true, 'payment_intent'=>$body_res['id']];
+        } else {
+            return new WP_REST_Response(['error'=>'stripe_error','details'=>$body_res], 400);
+        }
+    }
+
     public static function cancel($req){
         $params = json_decode($req->get_body(), true);
         if (!is_array($params)) $params = $req->get_params();
@@ -268,7 +326,11 @@ class OBTI_REST {
         if (!obti_can_cancel($booking_id)) return new WP_REST_Response(['error'=>'cannot_cancel_yet','message'=>__('You can cancel up to 72h before start.','obti')], 400);
 
         $pi = get_post_meta($booking_id, '_obti_payment_intent', true);
-        if (!$pi) return new WP_REST_Response(['error'=>'no_payment_intent'], 400);
+        if (!$pi){
+            wp_update_post(['ID'=>$booking_id, 'post_status'=>'obti-cancelled']);
+            do_action('obti_booking_cancelled', $booking_id, null);
+            return ['ok'=>true, 'message'=>__('Booking cancelled.','obti')];
+        }
         $secret = OBTI_Settings::get('stripe_secret_key','');
         $connect_enabled = !empty(OBTI_Settings::get('connect_enabled', 0));
         $platform_secret = OBTI_Settings::get('connect_platform_secret_key','');
