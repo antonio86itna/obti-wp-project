@@ -50,6 +50,52 @@ class OBTI_Checkout {
         return $user_id;
     }
 
+    /**
+     * Get a Stripe customer ID for the given email or create one if missing.
+     * Returns the customer ID or WP_Error on failure.
+     */
+    public static function get_or_create_stripe_customer($email, $name){
+        $email = sanitize_email($email);
+        $name  = sanitize_text_field($name);
+        $secret = OBTI_Settings::get('stripe_secret_key','');
+        if (empty($secret)){
+            return new WP_Error('missing_secret', __('Stripe secret key missing', 'obti'));
+        }
+
+        // Search for existing customer by email
+        $search_res = wp_remote_post('https://api.stripe.com/v1/customers/search', [
+            'headers' => [
+                'Authorization' => 'Bearer '.$secret,
+                'Content-Type'  => 'application/x-www-form-urlencoded'
+            ],
+            'body'    => http_build_query(['query' => sprintf('email:"%s"', $email)]),
+            'timeout' => 45
+        ]);
+        if (is_wp_error($search_res)) return $search_res;
+        $code_search = wp_remote_retrieve_response_code($search_res);
+        $json_search = json_decode(wp_remote_retrieve_body($search_res), true);
+        if ($code_search >= 200 && $code_search < 300 && !empty($json_search['data'][0]['id'])){
+            return $json_search['data'][0]['id'];
+        }
+
+        // Create new customer
+        $cust_res = wp_remote_post('https://api.stripe.com/v1/customers', [
+            'headers' => [
+                'Authorization' => 'Bearer '.$secret,
+                'Content-Type'  => 'application/x-www-form-urlencoded'
+            ],
+            'body'    => http_build_query(['email'=>$email,'name'=>$name]),
+            'timeout' => 45
+        ]);
+        if (is_wp_error($cust_res)) return $cust_res;
+        $code_cust = wp_remote_retrieve_response_code($cust_res);
+        $json_cust = json_decode(wp_remote_retrieve_body($cust_res), true);
+        if ($code_cust >= 200 && $code_cust < 300 && !empty($json_cust['id'])){
+            return $json_cust['id'];
+        }
+        return new WP_Error('stripe_error', __('Stripe error: ','obti').wp_remote_retrieve_body($cust_res));
+    }
+
     public static function create_checkout_session($booking_id){
         $email = get_post_meta($booking_id,'_obti_email', true);
         $name  = get_post_meta($booking_id,'_obti_name', true);
@@ -97,28 +143,11 @@ class OBTI_Checkout {
         $connect_enabled = !empty(OBTI_Settings::get('connect_enabled', 0));
         $platform_secret = OBTI_Settings::get('connect_platform_secret_key','');
         $connected = OBTI_Settings::get('connect_client_account_id','');
-
         $user_id = intval(get_post_meta($booking_id,'_obti_user_id', true));
-        $stripe_customer = $user_id ? get_user_meta($user_id, '_obti_stripe_customer_id', true) : '';
-        if (!$stripe_customer){
-            $cust_res = wp_remote_post('https://api.stripe.com/v1/customers', [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$secret,
-                    'Content-Type'  => 'application/x-www-form-urlencoded'
-                ],
-                'body'    => http_build_query(['email'=>$email,'name'=>$name]),
-                'timeout' => 45
-            ]);
-            if (is_wp_error($cust_res)) return $cust_res;
-            $code_cust = wp_remote_retrieve_response_code($cust_res);
-            $json_cust = json_decode(wp_remote_retrieve_body($cust_res), true);
-            if ($code_cust >= 200 && $code_cust < 300 && !empty($json_cust['id'])){
-                $stripe_customer = $json_cust['id'];
-                if ($user_id) update_user_meta($user_id, '_obti_stripe_customer_id', $stripe_customer);
-            } else {
-                return new WP_Error('stripe_error', __('Stripe error: ','obti').wp_remote_retrieve_body($cust_res));
-            }
-        }
+        $customer_id = self::get_or_create_stripe_customer($email, $name);
+        if (is_wp_error($customer_id)) return $customer_id;
+        update_post_meta($booking_id, '_obti_stripe_customer', $customer_id);
+        if ($user_id) update_user_meta($user_id, '_obti_stripe_customer_id', $customer_id);
 
         $headers = [
             'Authorization' => 'Bearer '.$secret,
@@ -128,7 +157,8 @@ class OBTI_Checkout {
             'mode' => 'payment',
             'success_url' => $success_url,
             'cancel_url'  => $cancel_url,
-            'customer' => $stripe_customer,
+            'customer' => $customer_id,
+            'customer_update[name]' => 'auto',
             'client_reference_id' => $booking_id,
             'metadata[booking_id]' => $booking_id,
         ];
