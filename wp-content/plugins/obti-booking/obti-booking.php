@@ -34,6 +34,7 @@ function obti_get_page_id( $title ) {
 
 // Activation: create pages + schedule cron + flush rewrite
 register_activation_hook(__FILE__, function(){
+    add_role('obti_customer', 'OBTI Customer', ['read' => true]);
     if (!wp_next_scheduled('obti_cleanup_holds')) { wp_schedule_event(time()+300, 'five_minutes', 'obti_cleanup_holds'); }
     OBTI_Booking_CPT::register();
     flush_rewrite_rules();
