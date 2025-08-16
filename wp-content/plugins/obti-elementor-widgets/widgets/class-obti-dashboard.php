@@ -33,15 +33,15 @@ class Dashboard extends Widget_Base {
                     <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div class="p-4 bg-blue-100 rounded text-center">
-                            <div class="text-sm text-gray-600"><?php esc_html_e('Biglietti attivi','obti'); ?></div>
+                            <div class="text-sm text-gray-600"><?php esc_html_e('Active Tickets','obti'); ?></div>
                             <div id="obti-active-count" class="text-2xl font-bold">0</div>
                         </div>
                         <div class="p-4 bg-green-100 rounded text-center">
-                            <div class="text-sm text-gray-600"><?php esc_html_e('Tour completati','obti'); ?></div>
+                            <div class="text-sm text-gray-600"><?php esc_html_e('Completed Tours','obti'); ?></div>
                             <div id="obti-completed-count" class="text-2xl font-bold">0</div>
                         </div>
                         <div class="p-4 bg-gray-100 rounded flex items-center justify-center">
-                            <a href="#" id="obti-book-btn" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Prenota','obti'); ?></a>
+                            <a href="#" id="obti-book-btn" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Book Now','obti'); ?></a>
                         </div>
                     </div>
                     <div id="obti-upcoming-card" class="hidden mb-6">
@@ -62,25 +62,25 @@ class Dashboard extends Widget_Base {
                     <h2 class="text-2xl font-bold mb-4"><?php esc_html_e('My Profile','obti'); ?></h2>
                     <form id="obti-profile-form" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Nome completo','obti'); ?></label>
+                            <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Full Name','obti'); ?></label>
                             <input id="obti-profile-name" type="text" class="mt-1 w-full border rounded px-3 py-2" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Email','obti'); ?></label>
                             <input id="obti-profile-email" type="email" class="mt-1 w-full border rounded px-3 py-2" />
                         </div>
-                        <button type="button" id="obti-profile-save" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Aggiorna','obti'); ?></button>
+                        <button type="button" id="obti-profile-save" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Update','obti'); ?></button>
                     </form>
                     <form id="obti-password-form" class="space-y-4 mt-8 border-t pt-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Nuova Password','obti'); ?></label>
+                            <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('New Password','obti'); ?></label>
                             <input id="obti-new-password" type="password" class="mt-1 w-full border rounded px-3 py-2" />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Conferma Password','obti'); ?></label>
+                            <label class="block text-sm font-medium text-gray-700"><?php esc_html_e('Confirm Password','obti'); ?></label>
                             <input id="obti-confirm-password" type="password" class="mt-1 w-full border rounded px-3 py-2" />
                         </div>
-                        <button type="button" id="obti-password-save" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Cambia Password','obti'); ?></button>
+                        <button type="button" id="obti-password-save" class="bg-theme-primary text-white px-4 py-2 rounded"><?php esc_html_e('Change Password','obti'); ?></button>
                     </form>
                 </div>
             </div>

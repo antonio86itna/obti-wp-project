@@ -89,20 +89,20 @@
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({first_name:first,last_name:last,email:emailInput.value.trim()})
-        }).then(function(){ alert('Profilo aggiornato'); }).catch(function(){});
+        }).then(function(){ alert('Profile updated'); }).catch(function(){});
       });
     }
     if(passSaveBtn){
       passSaveBtn.addEventListener('click', function(){
         var p1 = newPassInput.value;
         var p2 = confirmPassInput.value;
-        if(p1 !== p2 || !p1){ alert('Le password non coincidono'); return; }
+        if(p1 !== p2 || !p1){ alert('Passwords do not match'); return; }
         fetch(api + '/password', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify({password:p1})
         }).then(function(){
-          alert('Password aggiornata');
+          alert('Password updated');
           newPassInput.value='';
           confirmPassInput.value='';
         }).catch(function(){});
@@ -124,7 +124,7 @@
             var li = document.createElement('li');
             li.className = 'p-4 border rounded flex justify-between items-center';
             li.innerHTML = '<div><div class="font-semibold">'+(b.title||'')+'</div><div class="text-sm text-gray-600">'+(b.date||'')+'</div></div>'+
-              '<div class="flex items-center space-x-2"><span class="px-2 py-1 rounded text-xs font-semibold '+si.cls+'">'+si.text+'</span><button class="obti-detail text-theme-primary underline" data-id="'+b.id+'">Dettagli</button></div>';
+              '<div class="flex items-center space-x-2"><span class="px-2 py-1 rounded text-xs font-semibold '+si.cls+'">'+si.text+'</span><button class="obti-detail text-theme-primary underline" data-id="'+b.id+'">Details</button></div>';
             cont.appendChild(li);
             var ts = b.date ? new Date(b.date+'T'+(b.time||'00:00')).getTime() : null;
             if(ts && (!upTs || ts < upTs) && si.text === 'Confirmed'){
