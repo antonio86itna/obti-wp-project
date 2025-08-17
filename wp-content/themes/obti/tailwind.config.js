@@ -1,6 +1,7 @@
 module.exports = {
   content: [
     './**/*.php',
+    // Scan plugin directories for Tailwind class usage
     '../plugins/obti-elementor-widgets/**/*.{php,js}',
     '../plugins/obti-booking/**/*.{php,js}',
   ],
