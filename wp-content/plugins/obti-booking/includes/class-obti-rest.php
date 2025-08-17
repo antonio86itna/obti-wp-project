@@ -57,6 +57,11 @@ class OBTI_REST {
             'callback' => [__CLASS__, 'my_bookings'],
             'permission_callback' => [__CLASS__, 'auth_user']
         ]);
+        register_rest_route('obti/v1', '/overrides/(?P<index>\d+)', [
+            'methods' => 'DELETE',
+            'callback' => [__CLASS__, 'remove_override'],
+            'permission_callback' => [__CLASS__, 'auth_admin']
+        ]);
     }
 
     public static function auth($req){
@@ -100,6 +105,14 @@ class OBTI_REST {
         $o = OBTI_Settings::get_all();
         $times = is_array($o['times']) ? $o['times'] : array_map('trim', explode(',', $o['times']));
         $capacity_default = intval($o['capacity']);
+        $overrides = OBTI_Settings::get_overrides();
+        foreach($overrides as $ov){
+            if ($date >= $ov['from_date'] && $date <= $ov['to_date']){
+                $capacity_default = intval($ov['capacity']);
+                $times = is_array($ov['times']) ? $ov['times'] : array_map('trim', (array)$ov['times']);
+                break;
+            }
+        }
         $cutoff = intval($o['cutoff_min']);
         $tz = obti_wp_timezone_string();
         $slots = [];
@@ -121,6 +134,12 @@ class OBTI_REST {
             ];
         }
         return ['date'=>$date,'slots'=>$slots];
+    }
+
+    public static function remove_override($req){
+        $i = intval($req->get_param('index'));
+        OBTI_Settings::delete_override($i);
+        return ['success'=>true];
     }
 
     private static function sum_booked($date,$time){
