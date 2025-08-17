@@ -17,10 +17,15 @@ This repository contains the `wp-content` directory for the OpenBusTour Ischia s
     └── elementor/home.json
 ```
 
-## Installation
+## Setup
 
-1. Copy the `obti` theme along with the `obti-booking` and `obti-elementor-widgets` plugins into your site's `wp-content` directory, keeping the folder structure above.
-2. From `wp-content/themes/obti` install dependencies and build the CSS assets:
+1. **Install PHP dependencies**
+
+   ```
+   composer install
+   ```
+
+2. **Install and build theme assets**
 
    ```
    cd wp-content/themes/obti
@@ -28,14 +33,17 @@ This repository contains the `wp-content` directory for the OpenBusTour Ischia s
    npm run build:css
    ```
 
-## Building the Theme
-The theme relies on Tailwind CSS. To compile the stylesheet run:
+3. **Import Elementor templates**
 
-```
-cd wp-content/themes/obti
-npm install
-npm run build:css
-```
+   - Activate the **OBTI Elementor Widgets** plugin.
+   - In the WordPress admin go to **Elementor → Templates → Import Templates**.
+   - Select the `wp-content/elementor/home.json` file and click **Import**.
+
+4. **Configure theme settings**
+
+   - In the WordPress admin navigate to **Appearance → Customize → Theme Settings**.
+   - Provide URLs for **Facebook**, **Instagram**, and **Twitter**.
+   - Add your **Mapbox Token** and **Chatbot API Key** as needed.
 
 ## Theme Customizer Settings
 
