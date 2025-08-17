@@ -110,8 +110,8 @@ class OBTI_Checkout {
         $total = floatval(get_post_meta($booking_id,'_obti_total', true));
         $currency = strtolower(get_post_meta($booking_id,'_obti_currency', true) ?: 'eur');
 
-        $success_page_id = obti_get_page_id('Booking Success');
-        $cancel_page_id  = obti_get_page_id('Booking Cancelled');
+        $success_page_id = obti_get_page_id( 'Booking Success' );
+        $cancel_page_id  = obti_get_page_id( 'Booking Cancelled' );
         $success_url = $success_page_id ? get_permalink($success_page_id) : home_url('/');
         $cancel_url  = $cancel_page_id ? get_permalink($cancel_page_id) : home_url('/');
 
