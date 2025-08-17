@@ -12,7 +12,7 @@ $dashboard_url = $account_page_id ? get_permalink( $account_page_id ) : home_url
   <?php echo sprintf( esc_html__( 'Hi %s,', 'obti' ), esc_html( $name ) ); ?>
 </p>
 <p style="margin:0 0 16px 0;">
-  <?php echo sprintf( esc_html__( 'Your booking #%1$s for %2$s %3$s is reserved for 30 minutes. Please complete payment to confirm your seat.', 'obti' ), intval( $booking_id ), esc_html( $date ), esc_html( $time ) ); ?>
+  <?php echo sprintf( esc_html__( 'Your booking #%1$s for %2$s %3$s is reserved for 20 minutes. Please complete payment to confirm your seat.', 'obti' ), intval( $booking_id ), esc_html( $date ), esc_html( $time ) ); ?>
 </p>
 <p style="margin:0 0 16px 0;">
   <?php printf( esc_html__( 'Complete payment here: %s', 'obti' ), '<a href="' . esc_url( $checkout_url ) . '" style="color:#16a34a;">' . esc_html__( 'Pay now', 'obti' ) . '</a>' ); ?>
