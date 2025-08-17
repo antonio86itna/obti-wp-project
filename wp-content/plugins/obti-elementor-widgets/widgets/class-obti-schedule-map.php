@@ -1,12 +1,11 @@
 <?php
-namespace OBTI_EW;
-
 if ( ! defined( 'ABSPATH' ) ) exit;
+namespace OBTI_EW;
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 
-class Schedule_Map extends Widget_Base {
+class ScheduleMap extends Widget_Base {
     public function get_name(){ return __('obti-schedule-map','obti'); }
     public function get_title(){ return __('OBTI Schedule & Map','obti'); }
     public function get_icon(){ return 'eicon-time-line'; }
