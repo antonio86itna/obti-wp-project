@@ -39,6 +39,26 @@ class OBTI_Settings {
         $opts[$key] = $value;
         update_option('obti_settings', $opts);
     }
+
+    // Override helpers
+    public static function get_overrides(){
+        $items = get_option('obti_overrides', []);
+        return is_array($items) ? $items : [];
+    }
+
+    public static function add_override($rec){
+        $items = self::get_overrides();
+        $items[] = $rec;
+        update_option('obti_overrides', $items);
+    }
+
+    public static function delete_override($index){
+        $items = self::get_overrides();
+        if (isset($items[$index])){
+            unset($items[$index]);
+            update_option('obti_overrides', array_values($items));
+        }
+    }
 }
 
 // Admin settings page
@@ -111,7 +131,40 @@ class OBTI_Admin_Settings_Page {
     }
 
     public static function render(){
+        // Handle override add
+        if (!empty($_POST['obti_add_override']) && check_admin_referer('obti_add_override')){
+            $from = sanitize_text_field($_POST['from_date'] ?? '');
+            $to   = sanitize_text_field($_POST['to_date'] ?? '');
+            $times_raw = $_POST['times'] ?? '';
+            if (is_string($times_raw)) { $times_raw = explode(',', $times_raw); }
+            $times_raw = array_map('trim', (array)$times_raw);
+            $times = array_values(array_filter($times_raw, function($t){
+                return preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $t);
+            }));
+            $capacity = max(0, intval($_POST['capacity'] ?? 0));
+            if ($from && $to && $capacity && $times){
+                OBTI_Settings::add_override([
+                    'from_date'=>$from,
+                    'to_date'=>$to,
+                    'times'=>$times,
+                    'capacity'=>$capacity
+                ]);
+            }
+            wp_safe_redirect(menu_page_url('obti-booking', false));
+            exit;
+        }
+        // Handle override delete
+        if (!empty($_GET['delete_override'])){
+            $idx = intval($_GET['delete_override']);
+            if (check_admin_referer('obti_delete_override_'.$idx)){
+                OBTI_Settings::delete_override($idx);
+                wp_safe_redirect(menu_page_url('obti-booking', false));
+                exit;
+            }
+        }
+
         $o = OBTI_Settings::get_all();
+        $overrides = OBTI_Settings::get_overrides();
         ?>
         <div class="wrap">
           <h1>OBTI Booking — <?php esc_html_e('Settings','obti'); ?></h1>
@@ -165,6 +218,48 @@ class OBTI_Admin_Settings_Page {
             </table>
             <?php submit_button(); ?>
           </form>
+
+          <h2><?php esc_html_e('Overrides','obti'); ?></h2>
+          <?php if(!empty($overrides)): ?>
+          <table class="widefat striped">
+            <thead>
+              <tr>
+                <th><?php esc_html_e('From','obti'); ?></th>
+                <th><?php esc_html_e('To','obti'); ?></th>
+                <th><?php esc_html_e('Times','obti'); ?></th>
+                <th><?php esc_html_e('Capacity','obti'); ?></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php foreach($overrides as $i => $ov): ?>
+              <tr>
+                <td><?php echo esc_html($ov['from_date']); ?></td>
+                <td><?php echo esc_html($ov['to_date']); ?></td>
+                <td><?php echo esc_html(implode(',', (array)$ov['times'])); ?></td>
+                <td><?php echo esc_html($ov['capacity']); ?></td>
+                <td><a class="button" href="<?php echo esc_url( wp_nonce_url(add_query_arg('delete_override',$i), 'obti_delete_override_'.$i) ); ?>"><?php esc_html_e('Delete','obti'); ?></a></td>
+              </tr>
+            <?php endforeach; ?>
+            </tbody>
+          </table>
+          <?php else: ?>
+          <p><?php esc_html_e('No overrides','obti'); ?></p>
+          <?php endif; ?>
+
+          <h3><?php esc_html_e('Add override','obti'); ?></h3>
+          <form method="post">
+            <?php wp_nonce_field('obti_add_override'); ?>
+            <input type="hidden" name="obti_add_override" value="1">
+            <table class="form-table" role="presentation">
+              <tr><th><?php esc_html_e('From date','obti'); ?></th><td><input type="date" name="from_date" required></td></tr>
+              <tr><th><?php esc_html_e('To date','obti'); ?></th><td><input type="date" name="to_date" required></td></tr>
+              <tr><th><?php esc_html_e('Times (HH:MM, comma separated)','obti'); ?></th><td><input type="text" name="times" required></td></tr>
+              <tr><th><?php esc_html_e('Capacity','obti'); ?></th><td><input type="number" name="capacity" min="1" required></td></tr>
+            </table>
+            <?php submit_button(__('Add override','obti'),'secondary'); ?>
+          </form>
+
           <p><em><?php esc_html_e('Tip: exclude wp-json/obti/* and obti-stripe-webhook from cache plugins.','obti'); ?></em></p>
         </div>
         <?php
