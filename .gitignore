@@ -1,0 +1,12 @@
+# Dependency directories
+**/node_modules/
+**/vendor/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+
+# Composer lock file
+composer.lock
