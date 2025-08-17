@@ -1,13 +1,12 @@
 <?php
-namespace OBTI_EW;
-
 if ( ! defined( 'ABSPATH' ) ) exit;
+namespace OBTI_EW;
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 use Elementor\Repeater;
 
-class FAQ extends Widget_Base {
+class Faq extends Widget_Base {
     public function get_name(){ return __('obti-faq','obti'); }
     public function get_title(){ return __('OBTI FAQ','obti'); }
     public function get_icon(){ return 'eicon-help-o'; }

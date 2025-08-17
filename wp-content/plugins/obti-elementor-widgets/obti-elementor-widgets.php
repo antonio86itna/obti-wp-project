@@ -50,8 +50,8 @@ add_action('elementor/widgets/register', function($widgets_manager){
     require_once OBTI_EW_DIR.'widgets/class-obti-dashboard.php';
     $widgets_manager->register( new \OBTI_EW\Hero() );
     $widgets_manager->register( new \OBTI_EW\Highlights() );
-    $widgets_manager->register( new \OBTI_EW\Schedule_Map() );
-    $widgets_manager->register( new \OBTI_EW\FAQ() );
+    $widgets_manager->register( new \OBTI_EW\ScheduleMap() );
+    $widgets_manager->register( new \OBTI_EW\Faq() );
     $widgets_manager->register( new \OBTI_EW\Booking() );
     $widgets_manager->register( new \OBTI_EW\Chatbot() );
     $widgets_manager->register( new \OBTI_EW\Dashboard() );
