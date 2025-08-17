@@ -112,8 +112,8 @@ class OBTI_Checkout {
 
         $success_page_id = obti_get_page_id( 'Booking Success' );
         $cancel_page_id  = obti_get_page_id( 'Booking Cancelled' );
-        $success_url = $success_page_id ? get_permalink($success_page_id) : home_url('/');
-        $cancel_url  = $cancel_page_id ? get_permalink($cancel_page_id) : home_url('/');
+        $success_url     = $success_page_id > 0 ? get_permalink( $success_page_id ) : home_url( '/' );
+        $cancel_url      = $cancel_page_id > 0 ? get_permalink( $cancel_page_id )  : home_url( '/' );
 
         $success_url = add_query_arg(['session_id'=>'{CHECKOUT_SESSION_ID}','booking_id'=>$booking_id], $success_url);
         $cancel_url  = add_query_arg(['booking_id'=>$booking_id], $cancel_url);
