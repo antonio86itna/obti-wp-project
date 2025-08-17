@@ -11,6 +11,14 @@ if (!defined('ABSPATH')) { exit; }
 define('OBTI_EW_DIR', plugin_dir_path(__FILE__));
 define('OBTI_EW_URL', plugin_dir_url(__FILE__));
 
+// Load booking defaults if available but plugin inactive
+if ( ! class_exists('OBTI_Settings') ) {
+    $obti_settings_file = WP_PLUGIN_DIR . '/obti-booking/includes/class-obti-settings.php';
+    if ( file_exists( $obti_settings_file ) ) {
+        require_once $obti_settings_file;
+    }
+}
+
 // Activation check for Elementor
 register_activation_hook(__FILE__, function(){
     if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
@@ -27,6 +35,12 @@ add_action('admin_notices', function(){
 
 add_action('elementor/widgets/register', function($widgets_manager){
     if ( ! did_action( 'elementor/loaded' ) ) { return; }
+    if ( ! class_exists('OBTI_Settings') ) {
+        add_action('admin_notices', function(){
+            echo '<div class="notice notice-error"><p>' . esc_html__('OBTI Booking plugin is required for OBTI Elementor Widgets.', 'obti') . '</p></div>';
+        });
+        return;
+    }
     require_once OBTI_EW_DIR.'widgets/class-obti-hero.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-highlights.php';
     require_once OBTI_EW_DIR.'widgets/class-obti-schedule-map.php';
