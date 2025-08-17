@@ -50,7 +50,14 @@ class OBTI_Admin_Settings_Page {
     public static function menu(){
         add_menu_page('OBTI Booking', 'OBTI Booking', 'manage_options', 'obti-booking', [__CLASS__, 'render'], 'dashicons-tickets', 26);
         add_submenu_page('obti-booking', __('Settings','obti'), __('Settings','obti'), 'manage_options', 'obti-booking', [__CLASS__, 'render']);
-        add_submenu_page('obti-booking', __('Transfers Totaliweb','obti'), __('Transfers Totaliweb','obti'), 'manage_options', 'obti-transfers', ['OBTI_Transfers','render']);
+        add_submenu_page(
+            'obti-booking',
+            __('Transfers Totaliweb','obti'),
+            __('Transfers Totaliweb','obti'),
+            'manage_options',
+            'obti-transfers',
+            ['OBTI_Transfers','render']
+        );
     }
     public static function register(){
         register_setting('obti_settings_group', 'obti_settings', [
