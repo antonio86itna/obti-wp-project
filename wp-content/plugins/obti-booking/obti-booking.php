@@ -57,10 +57,15 @@ function obti_maybe_create_pages(){
         'My Bookings' => '[obti_account]',
         'My Account' => '[obti_dashboard]'
     ];
-    foreach($pages as $title=>$shortcode){
-        $exists = obti_get_page_id( $title );
-        if (!$exists) {
-            $id = wp_insert_post([ 'post_title'=>$title, 'post_type'=>'page', 'post_status'=>'publish', 'post_content'=>$shortcode ]);
+    foreach( $pages as $title => $shortcode ){
+        $page_id = obti_get_page_id( $title );
+        if ( ! $page_id ) {
+            $id = wp_insert_post([
+                'post_title'   => $title,
+                'post_type'    => 'page',
+                'post_status'  => 'publish',
+                'post_content' => $shortcode,
+            ]);
         }
     }
 }
@@ -174,7 +179,7 @@ add_action('admin_init', function(){
     $user = wp_get_current_user();
     if ( in_array( 'obti_customer', (array) $user->roles, true ) ) {
         $page_id = obti_get_page_id( 'My Account' );
-        if ( $page_id ) {
+        if ( $page_id > 0 ) {
             wp_safe_redirect( get_permalink( $page_id ) );
             exit;
         }
