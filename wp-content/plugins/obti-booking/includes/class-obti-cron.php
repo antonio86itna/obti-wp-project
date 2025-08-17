@@ -35,7 +35,8 @@ class OBTI_Cron {
         if (!$date || !$time) return;
         $ts = strtotime($date.' '.$time.' '.obti_wp_timezone_string());
         if ($ts){
-            wp_schedule_single_event($ts, 'obti_booking_start', [$post->ID]);
+            // Trigger 30 minutes before tour start
+            wp_schedule_single_event($ts - 30 * MINUTE_IN_SECONDS, 'obti_booking_start', [$post->ID]);
             if ($ts - DAY_IN_SECONDS > time()){
                 wp_schedule_single_event($ts - DAY_IN_SECONDS, 'obti_booking_reminder', [$post->ID]);
             }
@@ -46,13 +47,13 @@ class OBTI_Cron {
         if (get_post_status($booking_id) !== 'obti-confirmed') return;
         wp_update_post(['ID'=>$booking_id, 'post_status'=>'obti-in-progress']);
         self::email_customer_onboard($booking_id);
-        // Schedule completion 3 hours after start
+        // Schedule completion 165 minutes after start
         $date = get_post_meta($booking_id,'_obti_date', true);
         $time = get_post_meta($booking_id,'_obti_time', true);
         $ts = strtotime($date.' '.$time.' '.obti_wp_timezone_string());
         if ($ts){
             wp_clear_scheduled_hook('obti_booking_complete', [$booking_id]);
-            wp_schedule_single_event($ts + 3 * HOUR_IN_SECONDS, 'obti_booking_complete', [$booking_id]);
+            wp_schedule_single_event($ts + 165 * MINUTE_IN_SECONDS, 'obti_booking_complete', [$booking_id]);
         }
     }
 
