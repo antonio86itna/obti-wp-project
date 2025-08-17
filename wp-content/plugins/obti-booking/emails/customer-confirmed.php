@@ -6,8 +6,8 @@ $time         = get_post_meta( $booking_id, '_obti_time', true );
 $qty          = (int) get_post_meta( $booking_id, '_obti_qty', true );
 $total        = get_post_meta( $booking_id, '_obti_total', true );
 $address      = OBTI_Settings::get( 'address_label', 'Forio' );
-$account_page_id = obti_get_page_id( 'My Account' );
-$dashboard_url = $account_page_id ? get_permalink( $account_page_id ) : home_url( '/' );
+$account_page_id = obti_get_page_id( 'My Account' ); // Retrieve My Account page ID
+$dashboard_url   = $account_page_id ? get_permalink( $account_page_id ) : home_url( '/' );
 $checkout_url = $checkout_url ?? '#';
 ?>
 <?php include __DIR__ . '/partials/header.php'; ?>
