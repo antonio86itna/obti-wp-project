@@ -44,15 +44,15 @@ The theme adds a **Theme Settings** section under *Appearance → Customize* wit
 
 ## Elementor Home Template
 
-A prebuilt Home page layout using custom widgets is stored in [`wp-content/elementor/home.json`](wp-content/elementor/home.json).
-Re-import this template if you pull updates to ensure the latest Hero and Schedule & Map widgets are applied.
+A prebuilt Home page layout using custom widgets is stored in [`wp-content/elementor/home.json`](wp-content/elementor/home.json). Re-import this template if you pull updates to ensure the latest widgets are applied.
 
 ### Import instructions
-1. Ensure the **OBTI Elementor Widgets** plugin is active so that the custom widgets are available.
-2. Navigate to **Elementor → Templates → Import Templates** in the WordPress admin.
-3. Upload the `wp-content/elementor/home.json` file from this repository and click **Import**.
-4. Create or edit a page and insert the imported template to use the layout. The template sets the container width to **1280px**.
-5. If an older version of the Home template was previously imported, remove the old sections and insert the newly imported template to get the updated widgets.
+1. Activate the **OBTI Elementor Widgets** plugin so the custom widgets are available.
+2. In the WordPress admin go to **Elementor → Templates → Import Templates**.
+3. Choose the `wp-content/elementor/home.json` file from this repository and click **Import**.
+4. Create a new page (or edit an existing one) and click **Edit with Elementor**.
+5. Insert the imported **Home** template. The layout sets the container width to **1280px**.
+6. Optionally set this page as the site's front page under **Settings → Reading**.
 
 The template includes the following widgets in order: `obti-hero`, `obti-highlights`, `obti-schedule-map`, `obti-faq`, and `obti-booking`.
 
