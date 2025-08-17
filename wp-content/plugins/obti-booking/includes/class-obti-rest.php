@@ -29,12 +29,12 @@ class OBTI_REST {
         register_rest_route('obti/v1', '/bookings', [
             'methods' => 'GET',
             'callback' => [__CLASS__, 'bookings'],
-            'permission_callback' => '__return_true'
+            'permission_callback' => [__CLASS__, 'auth_admin']
         ]);
         register_rest_route('obti/v1', '/bookings/(?P<id>\d+)/transfer', [
             'methods' => 'PATCH',
             'callback' => [__CLASS__, 'mark_transfer'],
-            'permission_callback' => [__CLASS__, 'auth']
+            'permission_callback' => [__CLASS__, 'auth_admin']
         ]);
 
         register_rest_route('obti/v1', '/me', [
@@ -81,6 +81,13 @@ class OBTI_REST {
 
     public static function auth_user(){
         if (is_user_logged_in()) {
+            return true;
+        }
+        return new WP_Error('forbidden', __('Unauthorized', 'obti'), ['status' => 401]);
+    }
+
+    public static function auth_admin(){
+        if (current_user_can('manage_options')) {
             return true;
         }
         return new WP_Error('forbidden', __('Unauthorized', 'obti'), ['status' => 401]);
@@ -293,23 +300,23 @@ class OBTI_REST {
         return $items;
     }
     public static function bookings($req){
-        $date = sanitize_text_field($req->get_param('date'));
+        $date_from = sanitize_text_field($req->get_param('date_from'));
+        $date_to = sanitize_text_field($req->get_param('date_to'));
         $status = sanitize_text_field($req->get_param('status'));
-        $email = sanitize_email($req->get_param('email'));
         $args = [
             'post_type' => 'obti_booking',
             'posts_per_page' => -1,
             'post_status' => ['obti-confirmed', 'obti-in-progress', 'obti-pending', 'obti-cancelled'],
         ];
         if ($status) {
-            $args['post_status'] = $status;
+            $args['post_status'] = array_map('trim', explode(',', $status));
         }
         $meta = [];
-        if ($date) {
-            $meta[] = ['key' => '_obti_date', 'value' => $date, 'compare' => '='];
+        if ($date_from) {
+            $meta[] = ['key' => '_obti_date', 'value' => $date_from, 'compare' => '>='];
         }
-        if ($email) {
-            $meta[] = ['key' => '_obti_email', 'value' => $email, 'compare' => '='];
+        if ($date_to) {
+            $meta[] = ['key' => '_obti_date', 'value' => $date_to, 'compare' => '<='];
         }
         if ($meta) {
             $args['meta_query'] = $meta;
@@ -325,8 +332,8 @@ class OBTI_REST {
                 'time' => get_post_meta($id, '_obti_time', true),
                 'qty' => intval(get_post_meta($id, '_obti_qty', true)),
                 'total' => floatval(get_post_meta($id, '_obti_total', true)),
-                'status' => get_post_status($id),
-                'token' => get_post_meta($id, '_obti_manage_token', true),
+                'agency_fee' => floatval(get_post_meta($id, '_obti_agency_fee', true)),
+                'transfer_status' => get_post_meta($id, '_obti_fee_transferred', true) ?: 'no',
             ];
         }
         return $items;
@@ -337,9 +344,17 @@ class OBTI_REST {
         if (!$id || get_post_type($id) !== 'obti_booking') {
             return new WP_REST_Response(['error' => 'not_found'], 404);
         }
-        $status = sanitize_text_field($req->get_param('status') ?: 'yes');
-        update_post_meta($id, '_obti_fee_transferred', $status);
-        return ['id' => $id, 'transfer_status' => $status];
+        update_post_meta($id, '_obti_fee_transferred', 'yes');
+        return [
+            'id' => $id,
+            'customer' => get_post_meta($id, '_obti_name', true),
+            'date' => get_post_meta($id, '_obti_date', true),
+            'time' => get_post_meta($id, '_obti_time', true),
+            'qty' => intval(get_post_meta($id, '_obti_qty', true)),
+            'total' => floatval(get_post_meta($id, '_obti_total', true)),
+            'agency_fee' => floatval(get_post_meta($id, '_obti_agency_fee', true)),
+            'transfer_status' => 'yes',
+        ];
     }
 
     public static function pay($req){

@@ -81,15 +81,12 @@ The `obti-booking` plugin exposes authenticated endpoints under `/wp-json/obti/v
 
 ### Authentication
 
-Requests must include either:
-
-- `Authorization: Bearer <API_KEY>` header where the key is configured in the plugin settings.
-- A logged-in WordPress user via OAuth or another supported auth method.
+Requests must authenticate as a user with the `manage_options` capability. This can be done via WordPress login cookies or an application password.
 
 ### List bookings
 
 ```
-GET /wp-json/obti/v1/bookings?date=2024-01-01&status=obti-confirmed
+GET /wp-json/obti/v1/bookings?date_from=2024-01-01&date_to=2024-01-31&status=obti-confirmed
 ```
 
 Returns an array of bookings with fields `id`, `customer`, `date`, `time`, `qty`, `total`, `agency_fee` and `transfer_status`.
@@ -100,4 +97,4 @@ Returns an array of bookings with fields `id`, `customer`, `date`, `time`, `qty`
 PATCH /wp-json/obti/v1/bookings/{id}/transfer
 ```
 
-Marks the Totaliweb agency fee as transferred for the given booking. Optionally send `status=no` to reset.
+Marks the Totaliweb agency fee as transferred (`_obti_fee_transferred=yes`) for the given booking.
