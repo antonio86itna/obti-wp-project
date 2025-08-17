@@ -5,11 +5,16 @@ This repository contains the `wp-content` directory for the OpenBusTour Ischia s
 ## Structure
 
 ```
-wp-content/
-  themes/obti/
-  plugins/obti-booking/
-  plugins/obti-elementor-widgets/
-  elementor/home.json
+.
+├── .editorconfig
+├── .gitignore
+├── composer.json
+├── README.md
+└── wp-content/
+    ├── themes/obti/
+    ├── plugins/obti-booking/
+    ├── plugins/obti-elementor-widgets/
+    └── elementor/home.json
 ```
 
 ## Installation

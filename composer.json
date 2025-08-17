@@ -1,0 +1,7 @@
+{
+  "name": "obti/wp-project",
+  "description": "OBTI WordPress wp-content bundle",
+  "type": "project",
+  "license": "MIT",
+  "require": {}
+}
