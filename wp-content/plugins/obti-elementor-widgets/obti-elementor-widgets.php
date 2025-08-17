@@ -33,8 +33,14 @@ add_action('admin_notices', function(){
     }
 });
 
+if ( ! did_action( 'elementor/loaded' ) ) {
+    add_action('admin_notices', function(){
+        echo '<div class="notice notice-error"><p>' . esc_html__('Elementor plugin is required for OBTI Elementor Widgets.', 'obti') . '</p></div>';
+    });
+    return;
+}
+
 add_action('elementor/widgets/register', function($widgets_manager){
-    if ( ! did_action( 'elementor/loaded' ) ) { return; }
     if ( ! class_exists('OBTI_Settings') ) {
         add_action('admin_notices', function(){
             echo '<div class="notice notice-error"><p>' . esc_html__('OBTI Booking plugin is required for OBTI Elementor Widgets.', 'obti') . '</p></div>';
