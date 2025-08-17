@@ -2,6 +2,9 @@
 **/node_modules/
 **/vendor/
 
+# Build artifacts
+wp-content/themes/obti/assets/css/obti.css
+
 # Logs
 *.log
 
@@ -10,3 +13,7 @@
 
 # Composer lock file
 composer.lock
+
+# WordPress runtime files
+wp-content/uploads/
+wp-content/cache/
