@@ -52,7 +52,15 @@
               "id": "widget-highlights",
               "elType": "widget",
               "widgetType": "obti-highlights",
-              "settings": {}
+              "settings": {
+                "image": "https://images.unsplash.com/photo-1613230280200-5516d39d4d34?q=80&w=2070&auto=format&fit=crop",
+                "caption": "Our modern open-top bus ready for the island tour.",
+                "items": [
+                  {"icon": "sun", "text": "Open-air upper deck"},
+                  {"icon": "map-pin", "text": "Stops at iconic landmarks"},
+                  {"icon": "camera", "text": "Perfect photo opportunities"}
+                ]
+              }
             }
           ]
         }
