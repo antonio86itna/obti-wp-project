@@ -11,7 +11,8 @@ add_action('after_setup_theme', function(){
 // Enqueue assets (compiled CSS and Lucide icons)
 add_action('wp_enqueue_scripts', function(){
     // Compiled Tailwind CSS
-    wp_enqueue_style('obti-css', get_template_directory_uri() . '/assets/css/obti.css', [], '1.0.0');
+    $version = filemtime(get_template_directory() . '/assets/css/obti.css');
+    wp_enqueue_style('obti-css', get_template_directory_uri() . '/assets/css/obti.css', [], $version);
 
     // Lucide icons
     wp_enqueue_script('obti-lucide', 'https://unpkg.com/lucide@latest', [], null, true);
