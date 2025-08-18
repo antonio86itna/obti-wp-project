@@ -1,6 +1,10 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit;
 namespace OBTI_EW;
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 
 use Elementor\Widget_Base;
 
